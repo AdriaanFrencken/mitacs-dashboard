@@ -36,6 +36,7 @@ with st.sidebar:
     marker_size = st.slider('Marker size', min_value=1, max_value=10, value=5, step=1)
     line_width = st.slider('Line width', min_value=0.5, max_value=5.0, value=1.0, step=0.5)
     log_y = st.checkbox('Log y-axis', value=False)
+    st.subheader('Plot labels:')
 
 
 uploaded_files = st.file_uploader("Upload CSV files", type=['csv'], accept_multiple_files=True)
@@ -63,8 +64,12 @@ if uploaded_files:
         
         df_slice = df[(df['Aligned_time (s)'] >= time_min) & (df['Aligned_time (s)'] <= time_max)]
         
+        file_name = uploaded_file.name.split('.')[0]
+        with st.sidebar:
+            plot_label = st.text_input(f'{file_name}', value=file_name)
+        
         fig.add_scatter(x=df_slice['Aligned_time (s)'], y=df_slice['Current (A)'],
-                        name=uploaded_file.name, mode='markers+lines', 
+                        name=plot_label, mode='markers+lines', 
                         line=dict(width=line_width),
                         marker=dict(symbol='circle', size=marker_size))
 
