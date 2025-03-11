@@ -35,6 +35,7 @@ with st.sidebar:
     threshold_input = st.number_input('Threshold current (nA)', min_value=1, max_value=10000, value=100)
     marker_size = st.slider('Marker size', min_value=1, max_value=10, value=5, step=1)
     line_width = st.slider('Line width', min_value=0.5, max_value=5.0, value=1.0, step=0.5)
+    grid_spacing = st.slider('Grid spacing (seconds)', min_value=0.1, max_value=1.0, value=0.2, step=0.1)
     log_y = st.checkbox('Log y-axis', value=False)
     st.subheader('Plot labels:')
 
@@ -92,12 +93,19 @@ if uploaded_files:
         # Add font settings for axis labels and ticks
         xaxis=dict(
             title_font=dict(size=20),  # Increase axis label font size
-            tickfont=dict(size=16)     # Increase tick label font size
+            tickfont=dict(size=16),    # Increase tick label font size
+            showgrid=True,             # Show grid lines
+            gridwidth=1,               # Grid line width
+            gridcolor='lightgrey',     # Grid line color
+            dtick=grid_spacing         # Grid line spacing
         ),
         yaxis=dict(
             title_font=dict(size=20),  # Increase axis label font size
             tickfont=dict(size=16),    # Increase tick label font size
-            type='log' if log_y else 'linear'  # Toggle log scale based on checkbox
+            type='log' if log_y else 'linear',  # Toggle log scale based on checkbox
+            showgrid=True,             # Show grid lines
+            gridwidth=1,               # Grid line width
+            gridcolor='lightgrey'      # Grid line color
         )
     )
 
