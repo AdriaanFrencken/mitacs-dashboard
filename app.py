@@ -17,6 +17,7 @@ def find_pulse_start(df, threshold_current=1e-7, baseline_interval=[0.0, 1.0]):
 
 # Set page title
 st.title('IV Curve Analysis')
+st.caption('Created by: John Feng')
 
 with st.sidebar:
     align_pulse_start = st.checkbox('Align pulse start', value=True)
