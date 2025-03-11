@@ -6,14 +6,18 @@ import os
 
 st.set_page_config(layout="wide")
 
-def find_pulse_start(df, threshold_current=1e-7, baseline_interval=[0.0, 1.0]):
-    # Find the index of the first row where the current is greater than 0.1 A
-    df_slice = df[(df['Time (s)'] >= baseline_interval[0]) & (df['Time (s)'] <= baseline_interval[1])]
-    average_baseline_current = df_slice['Current (A)'].mean()
-    # st.write(f"Average baseline current: {average_baseline_current} A")
-    pulse_start_index = df[df['Current (A)'] > threshold_current].index[0]
-    pulse_start_time = df.loc[pulse_start_index - 1, 'Time (s)']
-    return pulse_start_index, pulse_start_time
+def find_pulse_start(df, threshold_current=1e-7):
+    filter = df['Current (A)'] > threshold_current
+    if filter.any():
+        above_threshold_index = df[filter]
+        pulse_start_index = above_threshold_index.index[0]
+        if pulse_start_index == 0: # if the first index is 0, then the pulse start index is 0
+            return 0, 0
+        else:
+            pulse_start_time = df.loc[pulse_start_index - 1, 'Time (s)']
+            return pulse_start_index, pulse_start_time
+    else: # if no index is above the threshold, then the pulse start index is 0
+        return 0, 0
 
 # Set page title
 st.title('IV Curve Analysis')
@@ -28,9 +32,10 @@ with st.sidebar:
         time_min, time_max = st.slider('Time range', min_value=-1.0, max_value=10.0, 
                                        value=(-0.2, 10.0), step=0.1)
         
-    threshold_input = st.number_input('Threshold current (nA)', min_value=1, max_value=1000, value=100)
-    marker_size = st.slider('Marker size', min_value=1, max_value=10, value=3, step=1)
+    threshold_input = st.number_input('Threshold current (nA)', min_value=1, max_value=10000, value=100)
+    marker_size = st.slider('Marker size', min_value=1, max_value=10, value=5, step=1)
     line_width = st.slider('Line width', min_value=0.5, max_value=5.0, value=1.0, step=0.5)
+    log_y = st.checkbox('Log y-axis', value=False)
 
 
 uploaded_files = st.file_uploader("Upload CSV files", type=['csv'], accept_multiple_files=True)
@@ -44,11 +49,12 @@ if uploaded_files:
     for uploaded_file in uploaded_files:
         # Read the CSV file
         df = pd.read_csv(uploaded_file, comment='#')
-        with st.expander(f'Raw data for {uploaded_file.name}'):
-            st.write(df)
         
         pulse_start_index, pulse_start_time = find_pulse_start(df, threshold_input*1e-9)
-        
+        with st.expander(f'Raw data for {uploaded_file.name}'):
+            df['Current (nA)'] = df['Current (A)'] * 1e9
+            st.write(f"Pulse start index: {pulse_start_index}, Pulse start time: {pulse_start_time}")
+            st.write(df)
         # Align time to pulse start
         if align_pulse_start:
             df['Aligned_time (s)'] = df['Time (s)'] - pulse_start_time
@@ -85,7 +91,8 @@ if uploaded_files:
         ),
         yaxis=dict(
             title_font=dict(size=20),  # Increase axis label font size
-            tickfont=dict(size=16)     # Increase tick label font size
+            tickfont=dict(size=16),    # Increase tick label font size
+            type='log' if log_y else 'linear'  # Toggle log scale based on checkbox
         )
     )
 
