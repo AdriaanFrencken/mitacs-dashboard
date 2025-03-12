@@ -33,6 +33,10 @@ with st.sidebar:
         ['Set1', 'Set2', 'Set3', 'D3', 'G10', 'T10', 'Plotly', 'Viridis', 'Plasma', 'Rainbow', 'Turbo'],
         index=0
     )
+
+    x_legend_position = st.number_input('Legend position X', min_value=0.0, max_value=1.0, value=0.9, step=0.1)
+    y_legend_position = st.number_input('Legend position Y', min_value=0.0, max_value=1.0, value=0.2, step=0.1)
+
     st.subheader('Plot labels:')
 
 
@@ -84,13 +88,7 @@ if uploaded_files:
         title='I-t Curves for All Files',
         height=800,  # Make figure taller
         width=1200,  # Make figure wider
-        legend=dict(
-            yanchor="top",
-            y=0.99,
-            xanchor="right",
-            x=0.99,
-            bgcolor='rgba(255, 255, 255, 0.8)'  # Semi-transparent white background
-        ),
+
         # Add font settings for axis labels and ticks
         xaxis=dict(
             title_font=dict(size=20),  # Increase axis label font size
@@ -107,6 +105,16 @@ if uploaded_files:
             showgrid=True,             # Show grid lines
             gridwidth=1,               # Grid line width
             gridcolor='lightgrey'      # Grid line color
+        )
+    )
+    fig.update_layout(
+        legend=dict(
+            yanchor='bottom',
+            y=y_legend_position,
+            xanchor='right',
+            x=x_legend_position,
+            bgcolor='rgba(255, 255, 255, 0.8)',  # Semi-transparent white background
+            font=dict(size=16)  # Increase legend font size
         )
     )
 
