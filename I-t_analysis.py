@@ -53,7 +53,8 @@ fig.update_layout(
     showlegend=True,
     legend_title_text='File Name',
     xaxis_title='Time (s)',
-    yaxis_title='Current (A)'
+    yaxis_title='Current (A)',
+    font = dict(size=30)
 )
 
 # Show the figure
