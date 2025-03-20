@@ -6,7 +6,7 @@ import os
 
 st.set_page_config(layout="wide")
 
-def find_pulse_start(df, threshold_current=1e-7):
+def find_pulse_start(df, threshold_current):
     filter = df['Current (A)'] > threshold_current
     if filter.any():
         above_threshold_index = df[filter]
@@ -24,6 +24,7 @@ st.title('I-t Curve Analysis')
 st.caption('Created by: John Feng')
 
 with st.sidebar:
+    uploaded_files = st.file_uploader("Upload CSV files", type=['csv'], accept_multiple_files=True)
     align_pulse_start = st.checkbox('Align pulse start', value=True)
     if align_pulse_start:
         time_min, time_max = st.slider('Time range', min_value=-1.0, max_value=10.0, 
@@ -39,11 +40,11 @@ with st.sidebar:
     log_y = st.checkbox('Log y-axis', value=False)
     size_x = st.slider('Plot width', min_value=300, max_value=1200, value=800, step=50)
     size_y = st.slider('Plot height', min_value=300, max_value=1200, value=800, step=50)
-    fontsize_axis = st.slider('Axis font size', min_value=10, max_value=50, value=20, step=5)
+    fontsize = st.slider('Axis font size', min_value=10, max_value=50, value=20, step=5)
     st.subheader('Plot labels:')
 
+    # Move file uploader to the sidebar
 
-uploaded_files = st.file_uploader("Upload CSV files", type=['csv'], accept_multiple_files=True)
 
 # File uploader
 if uploaded_files:
@@ -80,7 +81,7 @@ if uploaded_files:
     # Update layout for better visualization
     fig.update_layout(
         showlegend=True,
-        legend_title_text='File Name',
+        legend_title_text='',
         xaxis_title='Time (s)',
         yaxis_title='Current (A)',
         title='IV Curves for All Files',
@@ -91,20 +92,21 @@ if uploaded_files:
             y=0.99,
             xanchor="right",
             x=0.99,
-            bgcolor='rgba(255, 255, 255, 0.8)'  # Semi-transparent white background
+            bgcolor='rgba(255, 255, 255, 0.8)',  # Semi-transparent white background
+            font=dict(size=0.8*fontsize)
         ),
         # Add font settings for axis labels and ticks
         xaxis=dict(
-            title_font=dict(size=fontsize_axis),  # Increase axis label font size
-            tickfont=dict(size=fontsize_axis*0.8),    # Increase tick label font size
+            title_font=dict(size=fontsize),  # Increase axis label font size
+            tickfont=dict(size=fontsize*0.8),    # Increase tick label font size
             showgrid=True,             # Show grid lines
             gridwidth=1,               # Grid line width
             gridcolor='lightgrey',     # Grid line color
             dtick=grid_spacing         # Grid line spacing
         ),
         yaxis=dict(
-            title_font=dict(size=fontsize_axis),  # Increase axis label font size
-            tickfont=dict(size=fontsize_axis*0.8),    # Increase tick label font size
+            title_font=dict(size=fontsize),  # Increase axis label font size
+            tickfont=dict(size=fontsize*0.8),    # Increase tick label font size
             type='log' if log_y else 'linear',  # Toggle log scale based on checkbox
             showgrid=True,             # Show grid lines
             gridwidth=1,               # Grid line width

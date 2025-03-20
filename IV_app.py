@@ -7,8 +7,8 @@ import os
 st.set_page_config(layout="wide")
 
 # Set page title
-st.title('I-t Curve Analysis')
-st.caption('Created by: John Feng')
+st.title('IV Curve Analysis')
+st.caption('Created by: John Feng, adapted by Adriaan Frencken')
 
 with st.sidebar:
     marker_size = st.slider('Marker size', min_value=1, max_value=10, value=5, step=1)
@@ -50,7 +50,7 @@ if uploaded_files:
     # Update layout for better visualization
     fig.update_layout(
         showlegend=True,
-        legend_title_text='File Name',
+        legend_title_text='',
         xaxis_title='Voltage (V)',
         yaxis_title='Current (A)',
         title='IV Curves for All Files',
@@ -72,7 +72,8 @@ if uploaded_files:
             showgrid=True,             # Show grid lines
             gridwidth=1,               # Grid line width
             gridcolor='lightgrey',     # Grid line color
-            dtick=grid_spacing         # Grid line spacing
+            dtick="D10" if log_x else grid_spacing  # Log tick mark for log scale, linear spacing otherwise
+            
         ),
         yaxis=dict(
             title_font=dict(size=fontsize),  # Increase axis label font size
@@ -80,7 +81,8 @@ if uploaded_files:
             type='log' if log_y else 'linear',  # Toggle log scale based on checkbox
             showgrid=True,             # Show grid lines
             gridwidth=1,               # Grid line width
-            gridcolor='lightgrey'      # Grid line color
+            gridcolor='lightgrey',     # Grid line color
+            dtick="D10" if log_y else grid_spacing  # Log tick mark for log scale, default otherwise
         )
     )
 
