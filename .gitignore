@@ -1,3 +1,10 @@
 .venv
 __pycache__
 DATA
+.vscode
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
