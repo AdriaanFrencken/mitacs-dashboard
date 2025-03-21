@@ -14,6 +14,7 @@ with st.sidebar:
     marker_size = st.slider('Marker size', min_value=1, max_value=10, value=5, step=1)
     line_width = st.slider('Line width', min_value=0.5, max_value=5.0, value=1.0, step=0.5)
     grid_spacing = st.slider('Grid spacing (V)', min_value=50, max_value=500, value=200, step=50)
+    y_grid_spacing = st.slider('Grid spacing (A)', min_value=50, max_value=500, value=200, step=50)
     log_x = st.checkbox('Log x-axis', value=False)
     log_y = st.checkbox('Log y-axis', value=False)
     size_x = st.slider('Plot width', min_value=300, max_value=1200, value=800, step=50)
@@ -80,7 +81,10 @@ if uploaded_files:
             type='log' if log_y else 'linear',  # Toggle log scale based on checkbox
             showgrid=True,             # Show grid lines
             gridwidth=1,               # Grid line width
-            gridcolor='lightgrey'      # Grid line color
+            gridcolor='lightgrey',     # Grid line color
+            dtick=y_grid_spacing,
+            exponentformat='e',
+            showexponent='all'# Grid line spacing
         )
     )
 
