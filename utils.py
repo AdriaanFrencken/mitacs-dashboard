@@ -14,6 +14,18 @@ def find_pulse_start(df: pd.DataFrame, pulse_start_current: float = 1e-7) -> tup
     else: # if no index is above the threshold, then the pulse start index is 0
         return 0, 0
 
+def find_pulse_end(df: pd.DataFrame, threshold_current: float = 2e-6, 
+                   pulse_start_index: int = 0) -> tuple[int, float]:
+    df = df.iloc[pulse_start_index:]
+    filter = df['Current (A)'] < threshold_current
+    if filter.any():
+        pulse_end_index = df[filter].index[0] - 1
+        pulse_end_time = df.loc[pulse_end_index, 'Time (s)']
+        return pulse_end_index, pulse_end_time
+    else:
+        return df.index[-1], df.loc[df.index[-1], 'Time (s)']
+    
+
 def get_colors(n_files, color_scheme):
     # qualitative color schemes
     if color_scheme == 'Plotly':
