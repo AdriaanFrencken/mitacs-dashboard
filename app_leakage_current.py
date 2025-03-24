@@ -104,9 +104,13 @@ if uploaded_file:
         plot_title = st.text_input("Plot Title", value=uploaded_file.name)
         col1, col2 = st.columns(2)
         with col1:
-            show_top_edge = st.checkbox("Overlay Top Edge", value=True)
-        with col1:
-            show_falling_edge = st.checkbox("Overlay Falling Edge", value=True)
+            c1, c2 = st.columns(2)
+            with c1:
+                show_top_edge = st.checkbox("Overlay Top Edge", value=True)
+                show_falling_edge = st.checkbox("Overlay Falling Edge", value=True)
+            with c2:
+                show_threshold_line = st.checkbox("Current Threshold Line", value=True)
+                show_pulse_end_line = st.checkbox("Pulse End Line", value=True)
         with col2:
             calculate_leakage = st.checkbox("Calculate Leakage Current", value=True)
             c1, c2 = st.columns(2)
@@ -152,19 +156,21 @@ if uploaded_file:
     )
 
     # Add vertical and horizontal lines
-    fig.add_vline(
-        x=pulse_end_time - pulse_start_time,
-        line_dash="dash",
-        line_color="grey",
-        annotation_text=f"Pulse end: {(pulse_end_time - pulse_start_time):.3f} s",
-        annotation_position="top left",
-    )
-    fig.add_hline(
-        y=threshold_current,
-        line_dash="dash",
-        line_color="grey",
-        annotation_text=f"Threshold: {threshold_current:.2e} A",
-        annotation_position="bottom right",
+    if show_pulse_end_line:
+        fig.add_vline(
+            x=pulse_end_time - pulse_start_time,
+            line_dash="dash",
+            line_color="grey",
+            annotation_text=f"Pulse end: {(pulse_end_time - pulse_start_time):.3f} s",
+            annotation_position="top left",
+        )
+    if show_threshold_line:
+        fig.add_hline(
+            y=threshold_current,
+            line_dash="dash",
+            line_color="grey",
+            annotation_text=f"Threshold: {threshold_current:.2e} A",
+            annotation_position="bottom right",
     )
 
     df_top_edge = df.iloc[(pulse_start_index + left_edge_margin) : (pulse_end_index - right_edge_margin)]
@@ -241,7 +247,7 @@ if uploaded_file:
         afterglow_stats = calculate_falling_time(df_falling_edge, percent_drop=percent_drop_input)
         if afterglow_stats is not None:  # Only add lines if calculation was successful
             with col1:
-                st.write(f"Falling Time: {afterglow_stats['time_drop']:.4f} s")
+                st.write(f"Falling Time at {percent_drop_input*100}% Drop = {afterglow_stats['time_drop']*1e3:.2f} ms")
             fig.add_hline(
                 y=afterglow_stats['threshold_drop'],
                 line_dash="dash",
@@ -253,7 +259,7 @@ if uploaded_file:
                 x=afterglow_stats['time_index'],
                 line_dash="dash",
                 line_color="grey",
-                annotation_text=f"Time Drop: {afterglow_stats['time_drop']:.4f} s",
+                annotation_text=f"Time Drop: {afterglow_stats['time_drop']*1e3:.2f} ms",
                 annotation_position="bottom right",
             )
 
