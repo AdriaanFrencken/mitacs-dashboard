@@ -1,10 +1,10 @@
-yaxis=dict(
-    title_font=dict(size=20),  # Increase axis label font size
-    tickfont=dict(size=16),    # Increase tick label font size
-    type='log' if log_y else 'linear',  # Toggle log scale based on checkbox
-    showgrid=True,             # Show grid lines
-    gridwidth=1,               # Grid line width
-    gridcolor='lightgrey',     # Grid line color
-    exponentformat='e',        # Use scientific notation
-    showexponent='all'         # Show exponent for all numbers
-) 
+import streamlit as st
+
+
+pages = [st.Page('app_v1.py', title = 'I-t app v1'),
+        #  st.Page('app_v2.py', title = 'I-t app v2'),
+         st.Page('IV_app.py', title = 'IV app'),
+         st.Page('app_leakage_current.py', title = 'Leakage Current Analysis')]
+
+page = st.navigation(pages)
+page.run()
