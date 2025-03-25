@@ -14,6 +14,7 @@ st.caption("Created by: John Feng")
 
 
 with st.sidebar:
+    show_raw_data = st.checkbox("Show raw data", value=False)
     align_pulse_start = st.checkbox("Align pulse start", value=True)
     if align_pulse_start:
         time_min, time_max = st.slider(
@@ -71,12 +72,13 @@ for idx, data_file in enumerate(data_files):
     df = pd.read_csv(data_file, comment="#")
 
     pulse_start_index, pulse_start_time = find_pulse_start(df, threshold_input * 1e-9)
-    with st.expander(f"Raw data for {file_name}"):
-        df["Current (nA)"] = df["Current (A)"] * 1e9
-        st.write(
-            f"Pulse start index: {pulse_start_index}, Pulse start time: {pulse_start_time}"
-        )
-        st.write(df)
+    if show_raw_data:
+        with st.expander(f"Raw data for {file_name}"):
+            df["Current (nA)"] = df["Current (A)"] * 1e9
+            st.write(
+                f"Pulse start index: {pulse_start_index}, Pulse start time: {pulse_start_time}"
+            )
+            st.write(df)
     # Align time to pulse start
     if align_pulse_start:
         df["Aligned_time (s)"] = df["Time (s)"] - pulse_start_time
