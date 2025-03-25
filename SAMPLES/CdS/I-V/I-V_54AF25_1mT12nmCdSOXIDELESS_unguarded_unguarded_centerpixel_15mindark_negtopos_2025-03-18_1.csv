@@ -1,0 +1,66 @@
+#Procedure: <__main__.IVProcedure>
+#Parameters:
+#	Auto Meas. Range (Y/N): Y
+#	Averages: 50
+#	Contact ID: unguarded_centerpixel_15mindark_negtopos
+#	Data Points: 50
+#	Delay Before Measure: 1.5
+#	Device ID: 54AF25_1mT12nmCdSOXIDELESS_unguarded
+#	Distribution (lin/log): log
+#	Maximum Voltage: 1000
+#	Measurement Range: 1e-06
+#	Minimum Voltage: -1000
+#	Enable Temperature Control? (Y/N): N
+#	Setpoint Temperature: 25
+#Data:
+Device ID,Contact ID,Temperature (C),Voltage (V),Current (A),Current Std (A)
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-1000.0,0.0001,5.32558e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-681.2920690579615,0.0001,5.33466e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-464.15888336127773,0.0001,6.46766e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-316.22776601683796,0.0001,5.1521e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-215.44346900318845,5.31691e-05,4.93548e-08
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-146.77992676220705,1.71842e-05,2.45166e-08
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-100.0,6.1954e-06,8.74941e-09
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-68.12920690579615,2.33542e-06,2.41206e-09
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-46.4158883361278,8.54945e-07,1.19944e-09
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-31.622776601683793,2.72552e-07,4.28712e-10
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-21.544346900318846,8.63895e-08,1.31697e-10
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-14.677992676220699,3.38239e-08,4.5518e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-10.0,1.76998e-08,2.47921e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-6.812920690579615,1.08767e-08,1.7766e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-4.641588833612782,7.22877e-09,1.03591e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-3.1622776601683795,4.95523e-09,9.73485e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-2.1544346900318843,3.25991e-09,6.77782e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-1.4677992676220706,2.08273e-09,4.11437e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-1.0,1.33258e-09,3.24725e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-0.6812920690579615,8.64426e-10,2.53198e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-0.4641588833612782,5.55817e-10,2.16218e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-0.31622776601683794,3.56746e-10,2.40944e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-0.21544346900318845,2.333e-10,2.24617e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-0.14677992676220705,1.57104e-10,1.89622e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-0.1,1.1027e-10,1.55671e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,0.1,2.21535e-11,2.59615e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,0.14677992676220694,4.42805e-11,2.66869e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,0.21544346900318834,7.27555e-11,1.5025e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,0.31622776601683794,1.10218e-10,2.36061e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,0.46415888336127786,1.60415e-10,1.84943e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,0.6812920690579611,2.25797e-10,2.62826e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,1.0,3.09978e-10,2.23827e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,1.467799267622069,4.11978e-10,1.49624e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,2.1544346900318834,5.41431e-10,3.02127e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,3.1622776601683795,7.10858e-10,3.52656e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,4.6415888336127775,9.37887e-10,2.72284e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,6.812920690579611,1.27171e-09,2.91234e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,10.0,1.73827e-09,4.91581e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,14.67799267622069,2.52235e-09,3.56075e-12
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,21.54434690031882,3.65089e-09,1.11635e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,31.622776601683793,5.23127e-09,1.06902e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,46.41588833612777,7.5474e-09,2.8272e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,68.12920690579608,1.11426e-08,1.95344e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,100.0,1.6968e-08,4.77608e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,146.7799267622069,2.41067e-08,7.9662e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,215.44346900318823,3.36558e-08,9.67963e-11
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,316.22776601683796,4.83506e-08,1.34133e-10
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,464.15888336127773,7.09024e-08,2.6797e-10
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,681.2920690579608,1.15233e-07,3.71628e-10
+54AF25_1mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,1000.0,2.71619e-07,4.66248e-10

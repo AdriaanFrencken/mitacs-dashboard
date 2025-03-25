@@ -1,0 +1,66 @@
+#Procedure: <__main__.IVProcedure>
+#Parameters:
+#	Auto Meas. Range (Y/N): Y
+#	Averages: 50
+#	Contact ID: guarded_centerpixel
+#	Data Points: 50
+#	Delay Before Measure: 1.5
+#	Device ID: 31AF25_guardedtest
+#	Distribution (lin/log): log
+#	Maximum Voltage: 1000
+#	Measurement Range: 1e-06
+#	Minimum Voltage: -1000
+#	Enable Temperature Control? (Y/N): N
+#	Setpoint Temperature: 25
+#Data:
+Device ID,Contact ID,Temperature (C),Voltage (V),Current (A),Current Std (A)
+31AF25_guardedtest,guarded_centerpixel,nan,-1000.0,7.55971e-06,7.24631e-08
+31AF25_guardedtest,guarded_centerpixel,nan,-681.2920690579615,2.57414e-06,2.89599e-09
+31AF25_guardedtest,guarded_centerpixel,nan,-464.15888336127773,1.15153e-06,1.66447e-09
+31AF25_guardedtest,guarded_centerpixel,nan,-316.22776601683796,5.40107e-07,8.14392e-10
+31AF25_guardedtest,guarded_centerpixel,nan,-215.44346900318845,2.64643e-07,3.75923e-10
+31AF25_guardedtest,guarded_centerpixel,nan,-146.77992676220705,1.43553e-07,2.84653e-10
+31AF25_guardedtest,guarded_centerpixel,nan,-100.0,8.46635e-08,1.30053e-10
+31AF25_guardedtest,guarded_centerpixel,nan,-68.12920690579615,5.53011e-08,8.87664e-11
+31AF25_guardedtest,guarded_centerpixel,nan,-46.4158883361278,3.82203e-08,7.20735e-11
+31AF25_guardedtest,guarded_centerpixel,nan,-31.622776601683793,2.5769e-08,4.86027e-11
+31AF25_guardedtest,guarded_centerpixel,nan,-21.544346900318846,1.56623e-08,3.65206e-11
+31AF25_guardedtest,guarded_centerpixel,nan,-14.677992676220699,7.79011e-09,1.51426e-11
+31AF25_guardedtest,guarded_centerpixel,nan,-10.0,3.74461e-09,8.52549e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-6.812920690579615,1.9048e-09,4.18211e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-4.641588833612782,1.0695e-09,2.71149e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-3.1622776601683795,6.48279e-10,1.73611e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-2.1544346900318843,4.06142e-10,1.76423e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-1.4677992676220706,2.61648e-10,2.71126e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-1.0,1.73246e-10,2.43522e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-0.6812920690579615,1.16498e-10,2.43429e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-0.4641588833612782,8.15574e-11,2.43948e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-0.31622776601683794,5.99701e-11,2.27692e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-0.21544346900318845,4.63628e-11,1.81755e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-0.14677992676220705,2.75588e-11,2.59576e-12
+31AF25_guardedtest,guarded_centerpixel,nan,-0.1,1.16414e-11,2.40834e-12
+31AF25_guardedtest,guarded_centerpixel,nan,0.1,1.01317e-11,3.53573e-12
+31AF25_guardedtest,guarded_centerpixel,nan,0.14677992676220694,1.4539e-11,2.29701e-12
+31AF25_guardedtest,guarded_centerpixel,nan,0.21544346900318834,2.04291e-11,1.79634e-12
+31AF25_guardedtest,guarded_centerpixel,nan,0.31622776601683794,2.64031e-11,2.79385e-12
+31AF25_guardedtest,guarded_centerpixel,nan,0.46415888336127786,3.45952e-11,3.12671e-12
+31AF25_guardedtest,guarded_centerpixel,nan,0.6812920690579611,4.28534e-11,2.07828e-12
+31AF25_guardedtest,guarded_centerpixel,nan,1.0,5.2679e-11,2.90516e-12
+31AF25_guardedtest,guarded_centerpixel,nan,1.467799267622069,6.4365e-11,3.19207e-12
+31AF25_guardedtest,guarded_centerpixel,nan,2.1544346900318834,7.52462e-11,2.62297e-12
+31AF25_guardedtest,guarded_centerpixel,nan,3.1622776601683795,8.75278e-11,3.65693e-12
+31AF25_guardedtest,guarded_centerpixel,nan,4.6415888336127775,9.90631e-11,3.1325e-12
+31AF25_guardedtest,guarded_centerpixel,nan,6.812920690579611,1.09989e-10,3.1531e-12
+31AF25_guardedtest,guarded_centerpixel,nan,10.0,1.21234e-10,3.06801e-12
+31AF25_guardedtest,guarded_centerpixel,nan,14.67799267622069,1.32725e-10,3.12593e-12
+31AF25_guardedtest,guarded_centerpixel,nan,21.54434690031882,1.43391e-10,5.2805e-12
+31AF25_guardedtest,guarded_centerpixel,nan,31.622776601683793,1.61577e-10,7.04353e-12
+31AF25_guardedtest,guarded_centerpixel,nan,46.41588833612777,1.80351e-10,5.39554e-12
+31AF25_guardedtest,guarded_centerpixel,nan,68.12920690579608,2.07958e-10,6.90642e-12
+31AF25_guardedtest,guarded_centerpixel,nan,100.0,2.52408e-10,6.27006e-12
+31AF25_guardedtest,guarded_centerpixel,nan,146.7799267622069,3.21817e-10,6.94623e-12
+31AF25_guardedtest,guarded_centerpixel,nan,215.44346900318823,4.11928e-10,2.19035e-11
+31AF25_guardedtest,guarded_centerpixel,nan,316.22776601683796,5.75469e-10,2.88984e-11
+31AF25_guardedtest,guarded_centerpixel,nan,464.15888336127773,8.60699e-10,2.96853e-11
+31AF25_guardedtest,guarded_centerpixel,nan,681.2920690579608,1.40609e-09,3.43344e-11
+31AF25_guardedtest,guarded_centerpixel,nan,1000.0,2.46048e-09,2.9364e-11
