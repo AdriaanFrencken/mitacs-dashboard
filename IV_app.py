@@ -1,9 +1,10 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import os
 import plotly.graph_objects as go
 import plotly.express as px
-from utils import get_colors, calculate_first_derivative
+from utils import get_colors, calculate_first_derivative, data_extractor, extract_filename
 
 st.set_page_config(layout="wide")
 
@@ -28,68 +29,55 @@ with st.sidebar:
         "Color scheme", ["Plotly", "Set1", "Set2", "Set3", "D3", "G10", "T10"]
     )
     st.subheader("Plot labels:")
-    # grid_spacing = st.slider('Grid spacing (V)', min_value=50, max_value=500, value=200, step=50)
-    # y_grid_spacing = st.slider('Grid spacing (A)', min_value=50, max_value=500, value=200, step=50)
 
-container_1 = st.container()  # for IV curves
+# Data extraction process from uploaded files or sample files
+data_source, data_files = data_extractor()
 
-uploaded_files = st.file_uploader(
-    "Upload CSV files", type=["csv"], accept_multiple_files=True
-)
-
+# Create a figure for all curves
+fig = go.Figure()
+colors = get_colors(len(data_files), color_scheme)
 df_bar_chart = pd.DataFrame()
 
-# File uploader
-if uploaded_files:
-    # Create a figure for all curves
-    fig = go.Figure()
+for i, data_file in enumerate(data_files):
+    file_name = extract_filename(data_source, data_file)
+    # Read the CSV file
+    df = pd.read_csv(data_file, comment="#")
+    # Calculate first derivative
+    df = calculate_first_derivative(df)
 
-    colors = get_colors(len(uploaded_files), color_scheme)
-    # container_1 = st.container()
-    # Process each uploaded file
-    for i, uploaded_file in enumerate(uploaded_files):
-        # Read the CSV file
-        df = pd.read_csv(uploaded_file, comment="#")
-        # Calculate first derivative
-        df = calculate_first_derivative(df)
+    current_at_1000V = df[df["Voltage (V)"] == 1000]["Current (A)"]
+    df_bar_chart = pd.concat(
+        [
+            df_bar_chart,
+            pd.DataFrame(
+                {
+                    "Index": [i],
+                    "File Name": file_name,
+                    "Device ID": df["Device ID"].iloc[0],
+                    "Contact ID": df["Contact ID"].iloc[0],
+                    "Current at 1000V": current_at_1000V,
+                    "Color": colors[i],
+                }
+            ),
+        ]
+    )
 
-        # with st.expander(f'Raw data for {uploaded_file.name}'):
-        #     df['Current (nA)'] = df['Current (A)'] * 1e9
-        #     st.write(df)
-        current_at_1000V = df[df["Voltage (V)"] == 1000]["Current (A)"]
-        df_bar_chart = pd.concat(
-            [
-                df_bar_chart,
-                pd.DataFrame(
-                    {
-                        "Index": [i],
-                        "File Name": uploaded_file.name,
-                        "Device ID": df["Device ID"].iloc[0],
-                        "Contact ID": df["Contact ID"].iloc[0],
-                        "Current at 1000V": current_at_1000V,
-                        "Color": colors[i],
-                    }
-                ),
-            ]
-        )
+    if only_positive_voltage:
+        df = df[df["Voltage (V)"] > 0]
+    elif only_negative_voltage:
+        df = df[df["Voltage (V)"] < 0]
 
-        if only_positive_voltage:
-            df = df[df["Voltage (V)"] > 0]
-        elif only_negative_voltage:
-            df = df[df["Voltage (V)"] < 0]
-        # Align time to pulse start
-        file_name = uploaded_file.name.split(".")[0]
-        with st.sidebar:
-            plot_label = st.text_input(f"{file_name}", value=file_name)
+    with st.sidebar:
+        plot_label = st.text_input(f"{file_name}", value=file_name)
 
-        fig.add_scatter(
-            x=df["Voltage (V)"],
-            y=df["Current (A)"],
-            name=plot_label,
-            mode="markers+lines",
-            line=dict(width=line_width),
-            marker=dict(symbol="circle", size=marker_size, color=colors[i]),
-        )
+    fig.add_scatter(
+        x=df["Voltage (V)"],
+        y=df["Current (A)"],
+        name=plot_label,
+        mode="markers+lines",
+        line=dict(width=line_width),
+        marker=dict(symbol="circle", size=marker_size, color=colors[i]),
+    )
 
     # Update layout for better visualization
     fig.update_layout(
@@ -132,18 +120,22 @@ if uploaded_files:
     )
 
     # Display the plot with full width
-    with container_1:
-        st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
+    # with container_1:
+st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
 
-    # with st.expander("Current at 1000V"):
-    #     st.write(df_bar_chart)
-
+with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
+    col1, col2 = st.columns(2)
+    with col1:
+        x_choice = st.radio("X-axis", ["File Name", "Device ID", "Contact ID"])
+    with col2:
+        group_choice = st.radio("Group by", ["File Name", "Device ID", "Contact ID"])
     fig_bar = px.bar(
         df_bar_chart,
-        x="Device ID",
+        x=x_choice,
         y="Current at 1000V",
-        color="Device ID",
+        color=group_choice,
         color_discrete_map=dict(zip(df_bar_chart["Device ID"], df_bar_chart["Color"])),
+        barmode='group'  # Show bars side by side
     )
     
     fig_bar.update_layout(
@@ -151,6 +143,8 @@ if uploaded_files:
         height=size_y,  # Make figure taller
         width=size_x,  # Make figure wider
         showlegend=True,
+        bargap=0.15,  # Reduce space between bars in different groups
+        bargroupgap=0.1,  # Reduce space between bars in the same group
         legend=dict(
             yanchor="bottom",
             y=0.99,
@@ -172,9 +166,6 @@ if uploaded_files:
             tickfont=dict(size=fontsize * 0.8),  # Increase tick label font size
         ),
     )
-    with st.expander("Bar Chart of Dark Current at 1000V"):
-        st.plotly_chart(fig_bar, use_container_width=True, config={"responsive": True})
+    st.plotly_chart(fig_bar, use_container_width=True, config={"responsive": True})
 
 
-else:
-    st.write("Please upload CSV files to begin analysis")

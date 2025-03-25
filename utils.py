@@ -1,6 +1,9 @@
 import plotly.express as px
 import pandas as pd
 import numpy as np
+import os
+import streamlit as st
+
 
 def get_colors(n_files, color_scheme):
     # qualitative color schemes
@@ -64,3 +67,40 @@ def calculate_first_derivative(df: pd.DataFrame) -> pd.DataFrame:
     df['power_law_slope'] = np.gradient(df['log10_current'], df['log10_voltage'])
     return df
 
+def data_extractor():
+    data_source = st.radio(
+        "Choose data source", ["Upload CSV", "Load samples"], horizontal=True,
+        index=1
+    )
+
+    if data_source == "Load samples":
+        sample_folder_1 = os.listdir(r"SAMPLES\\TiO2\\I-V")
+        sample_files_1 = [os.path.join(r"SAMPLES\\TiO2\\I-V", f) for f in sample_folder_1]
+        sample_folder_2 = os.listdir(r"SAMPLES\\CdS\\I-V")
+        sample_files_2 = [os.path.join(r"SAMPLES\\CdS\\I-V", f) for f in sample_folder_2]
+        all_sample_files = sample_files_1 + sample_files_2
+        selected_sample_files = st.multiselect(
+            "Select sample files", options=all_sample_files, default=all_sample_files,
+            label_visibility="visible", help="Select the sample file for analysis"
+        )
+        data_files = selected_sample_files
+
+    elif data_source == "Upload CSV":
+        uploaded_files = st.file_uploader(
+            "Upload CSV files", type=["csv"], accept_multiple_files=True
+        )
+        if uploaded_files:
+            data_files = uploaded_files
+        else:
+            st.warning("Please upload CSV files to begin analysis")
+            st.stop()
+    
+    return data_source, data_files
+
+def extract_filename(data_source, data_file):
+    if data_source == "Load samples":
+        file_name = data_file.split("\\")[-1].split(".")[0]
+    elif data_source == "Upload CSV":
+        file_name = data_file.name
+    return file_name
+    
