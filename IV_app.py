@@ -31,7 +31,7 @@ with st.sidebar:
     st.subheader("Plot labels:")
 
 # Data extraction process from uploaded files or sample files
-data_source, data_files = data_extractor()
+data_source, data_files = data_extractor(measurement_type="I-V")
 
 # Create a figure for all curves
 fig = go.Figure()

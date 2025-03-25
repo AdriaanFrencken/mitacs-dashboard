@@ -67,18 +67,27 @@ def calculate_first_derivative(df: pd.DataFrame) -> pd.DataFrame:
     df['power_law_slope'] = np.gradient(df['log10_current'], df['log10_voltage'])
     return df
 
-def data_extractor():
+def data_extractor(measurement_type: str):
     data_source = st.radio(
         "Choose data source", ["Upload CSV", "Load samples"], horizontal=True,
         index=1
     )
-
-    if data_source == "Load samples":
+    if measurement_type == "I-V":
         sample_folder_1 = os.listdir(r"SAMPLES\\TiO2\\I-V")
         sample_files_1 = [os.path.join(r"SAMPLES\\TiO2\\I-V", f) for f in sample_folder_1]
         sample_folder_2 = os.listdir(r"SAMPLES\\CdS\\I-V")
         sample_files_2 = [os.path.join(r"SAMPLES\\CdS\\I-V", f) for f in sample_folder_2]
         all_sample_files = sample_files_1 + sample_files_2
+    elif measurement_type == "I-t":
+        sample_folder_1 = os.listdir(r"SAMPLES\\TiO2\\I-t")
+        sample_files_1 = [os.path.join(r"SAMPLES\\TiO2\\I-t", f) for f in sample_folder_1]
+        sample_folder_2 = os.listdir(r"SAMPLES\\CdS\\I-t")
+        sample_files_2 = [os.path.join(r"SAMPLES\\CdS\\I-t", f) for f in sample_folder_2]
+        all_sample_files = sample_files_1 + sample_files_2
+    else:
+        st.error("Invalid measurement type")
+        st.stop()
+    if data_source == "Load samples":
         selected_sample_files = st.multiselect(
             "Select sample files", options=all_sample_files, default=all_sample_files,
             label_visibility="visible", help="Select the sample file for analysis"
