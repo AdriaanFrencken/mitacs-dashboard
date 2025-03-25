@@ -2,54 +2,12 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from scipy.optimize import curve_fit
+import os
 import plotly.graph_objects as go
 from utils import get_colors, find_pulse_end, find_pulse_start
+from leakage_current_functions import calculate_current_difference, calculate_falling_time, exponential_fit, power_law_fit
 
 st.set_page_config(layout="wide")
-
-def exponential_fit(x, a, b, c):
-    return np.exp(-a * x + b) + c
-
-def power_law_fit(x, a, n, c):
-    return (x - a) ** n + c - a
-
-def calculate_current_difference(df_top_edge, first_n_points=10, last_n_points=10):
-    """Calculate the change in current between the beginning and end of the top edge. The calculation averages the first and last n points.
-    """
-    start = df_top_edge["Current (A)"].iloc[:first_n_points].mean()
-    end = df_top_edge["Current (A)"].iloc[-last_n_points:].mean()
-    difference = end-start
-    leakage_stats = {'start': start, 'end': end, 'difference': difference}
-    return leakage_stats
-
-def calculate_falling_time(df_falling_edge, percent_drop=0.98):
-    """Calculate the time it takes for the current to drop to a certain percentage of its initial value.
-    """
-    try:
-        current_A = df_falling_edge["Current (A)"].iloc[0]
-        current_B = df_falling_edge["Current (A)"].iloc[-10:].mean()
-        initial_current = abs(current_A - current_B)
-        threshold_drop = initial_current * (1.0-percent_drop)
-        
-        first_index = df_falling_edge.index[0]
-        last_index = df_falling_edge.index[-1]
-        # st.write(f"First index: {first_index}, Last index: {last_index} of Falling Edge")
-        # Find the first index where current drops below threshold
-        threshold_indices = df_falling_edge[df_falling_edge["Current (A)"] <= threshold_drop].index
-        if len(threshold_indices) == 0:
-            st.warning("Current did not drop below threshold within the selected time range")
-            return None
-            
-        threshold_index = threshold_indices[0]
-        # st.write(f"Threshold index: {threshold_index}")
-        time_index = df_falling_edge["Aligned_time (s)"].iloc[threshold_index-first_index]
-        time_drop = time_index - df_falling_edge["Aligned_time (s)"].iloc[0]
-        afterglow_stats = {'threshold_drop': threshold_drop, 'time_index': time_index, 'time_drop': time_drop}
-        
-        return afterglow_stats
-    except Exception as e:
-        st.error(f"Error calculating falling time: {str(e)}")
-        return None
 
 # Set page title
 st.title("Leakage Current Analysis")
@@ -94,188 +52,221 @@ with st.sidebar:
         step=100,
     )
 
-# File uploader
-uploaded_files = st.file_uploader("Upload CSV file", type=["csv"], accept_multiple_files=True)
+data_source = st.radio(
+    "Choose data source", ["Upload CSV", "Load samples"], horizontal=True
+)
+
+if data_source == "Load samples":
+    sample_folder_1 = os.listdir(r"SAMPLES\\TiO2\\I-t")
+    sample_files_1 = [os.path.join(r"SAMPLES\\TiO2\\I-t", f) for f in sample_folder_1]
+    sample_folder_2= os.listdir(r"SAMPLES\\CdS\\I-t")
+    sample_files_2 = [os.path.join(r"SAMPLES\\CdS\\I-t", f) for f in sample_folder_2]
+    all_sample_files = sample_files_1 + sample_files_2
+    data_files = all_sample_files
+    selected_data_files = st.multiselect("Select data files", options=data_files, default=data_files, label_visibility="visible", help="Select the data file for analysis")
+elif data_source == "Upload CSV":
+    uploaded_files = st.file_uploader("Upload CSV file", type=["csv"], accept_multiple_files=True)
+    if uploaded_files:
+        data_files = uploaded_files
+    else:
+        st.warning("Please upload CSV files to begin analysis")
+        st.stop()
 
 colors = get_colors(10, color_scheme)
 
-if uploaded_files:
-    with st.expander("Control Panel", expanded=False):
-        col1, col2 = st.columns(2)
-        with col1:
-            c1, c2 = st.columns(2)
-            with c1:
-                show_top_edge = st.checkbox("Overlay Top Edge", value=True)
-                show_falling_edge = st.checkbox("Overlay Falling Edge", value=True)
-            with c2:
-                show_threshold_line = st.checkbox("Current Threshold Line", value=True)
-                show_pulse_end_line = st.checkbox("Pulse End Line", value=True)
-        with col2:
-            calculate_leakage = st.checkbox("Calculate Leakage Current", value=True)
-            c1, c2 = st.columns(2)
-            with c1:
-                first_n_points = st.number_input("First n Points to average", min_value=1, max_value=100, value=10, step=1)
-            with c2:
-                last_n_points = st.number_input("Last n Points to average", min_value=1, max_value=100, value=10, step=1)
-        with col1:
-            c1, c2 = st.columns(2)
-            with c1:
-                calculate_afterglow = st.checkbox("Calculate Falling Time of Afterglow", value=True)
-            with c2:
-                percent_drop_input = st.number_input("Percent Drop", min_value=0.80, max_value=1.0, value=0.98, step=0.01)
+with st.expander("Control Panel", expanded=False):
+    col1, col2 = st.columns(2)
+    with col1:
+        c1, c2 = st.columns(2)
+        with c1:
+            show_top_edge = st.checkbox("Overlay Top Edge", value=True)
+            show_falling_edge = st.checkbox("Overlay Falling Edge", value=True)
+        with c2:
+            show_threshold_line = st.checkbox("Current Threshold Line", value=True)
+            show_pulse_end_line = st.checkbox("Pulse End Line", value=True)
+    with col2:
+        calculate_leakage = st.checkbox("Calculate Leakage Current", value=True)
+        c1, c2 = st.columns(2)
+        with c1:
+            first_n_points = st.number_input("First n Points to average", min_value=1, max_value=100, value=10, step=1)
+        with c2:
+            last_n_points = st.number_input("Last n Points to average", min_value=1, max_value=100, value=10, step=1)
+    with col1:
+        c1, c2 = st.columns(2)
+        with c1:
+            calculate_afterglow = st.checkbox("Calculate Falling Time of Afterglow", value=True)
+        with c2:
+            percent_drop_input = st.number_input("Percent Drop", min_value=0.80, max_value=1.0, value=0.98, step=0.01)
     
-    for uploaded_file in uploaded_files:
-        # Read the CSV file
-        df = pd.read_csv(uploaded_file, comment="#")
+stats_container = st.container()
+stats_df = pd.DataFrame()
+for idx, data_file in enumerate(data_files):
+    if data_source == "Load samples":
+        file_name = data_file.split("\\")[-1].split(".")[0]
+    elif data_source == "Upload CSV":
+        file_name = data_file.name
 
-        # Find pulse start and end
-        pulse_start_index, pulse_start_time = find_pulse_start(df, threshold_current)
-        pulse_end_index, pulse_end_time = find_pulse_end(
-            df, threshold_current, pulse_start_index
+    # Read the CSV file
+    df = pd.read_csv(data_file, comment="#")
+
+    # Find pulse start and end
+    pulse_start_index, pulse_start_time = find_pulse_start(df, threshold_current)
+    pulse_end_index, pulse_end_time = find_pulse_end(
+        df, threshold_current, pulse_start_index
+    )
+
+    # Align time
+    df["Aligned_time (s)"] = df["Time (s)"] - pulse_start_time
+    df_slice = df[
+        (df["Aligned_time (s)"] >= time_min) & (df["Aligned_time (s)"] <= time_max)
+    ]
+
+    # Create main plot
+    fig = go.Figure()
+
+    # Add main trace
+    fig.add_trace(
+        go.Scatter(
+            x=df_slice["Aligned_time (s)"],
+            y=df_slice["Current (A)"],
+            mode="markers+lines",
+            name="Full Curve",
+            line=dict(color=colors[0]),
+            marker=dict(color=colors[0]),
         )
+    )
 
-        # Align time
-        df["Aligned_time (s)"] = df["Time (s)"] - pulse_start_time
-        df_slice = df[
-            (df["Aligned_time (s)"] >= time_min) & (df["Aligned_time (s)"] <= time_max)
-        ]
+    # Add vertical and horizontal lines
+    if show_pulse_end_line:
+        fig.add_vline(
+            x=pulse_end_time - pulse_start_time,
+            line_dash="dash",
+            line_color="grey",
+            annotation_text=f"Pulse end: {(pulse_end_time - pulse_start_time):.3f} s",
+            annotation_position="top left",
+        )
+    if show_threshold_line:
+        fig.add_hline(
+            y=threshold_current,
+            line_dash="dash",
+            line_color="grey",
+            annotation_text=f"Threshold: {threshold_current:.2e} A",
+            annotation_position="bottom right",
+    )
 
-        # Create main plot
-        fig = go.Figure()
-
-        # Add main trace
+    df_top_edge = df.iloc[(pulse_start_index + left_edge_margin) : (pulse_end_index - right_edge_margin)]
+    if show_top_edge:
         fig.add_trace(
             go.Scatter(
-                x=df_slice["Aligned_time (s)"],
-                y=df_slice["Current (A)"],
+                x=df_top_edge["Aligned_time (s)"],
+                y=df_top_edge["Current (A)"],
                 mode="markers+lines",
-                name="Full Curve",
-                line=dict(color=colors[0]),
-                marker=dict(color=colors[0]),
+                name="Top Edge",
+                line=dict(color=colors[1]),
+                marker=dict(color=colors[1]),
             )
         )
 
-        # Add vertical and horizontal lines
-        if show_pulse_end_line:
-            fig.add_vline(
-                x=pulse_end_time - pulse_start_time,
-                line_dash="dash",
-                line_color="grey",
-                annotation_text=f"Pulse end: {(pulse_end_time - pulse_start_time):.3f} s",
-                annotation_position="top left",
+    df_falling_edge = df.iloc[(pulse_end_index + falling_edge_margin) : (pulse_end_index + n_time_points)]
+    if show_falling_edge:
+        fig.add_trace(
+            go.Scatter(
+                x=df_falling_edge["Aligned_time (s)"],
+                y=df_falling_edge["Current (A)"],
+                mode="markers+lines",
+                name="Falling Edge",
+                line=dict(color=colors[2]),
+                marker=dict(color=colors[2]),
             )
-        if show_threshold_line:
-            fig.add_hline(
-                y=threshold_current,
-                line_dash="dash",
-                line_color="grey",
-                annotation_text=f"Threshold: {threshold_current:.2e} A",
-                annotation_position="bottom right",
+        )
+    # Update layout
+    fig.update_layout(
+        title=file_name,
+        xaxis_title="Aligned Time (s)",
+        yaxis_title="Current (A)",
+        height=600,
+        xaxis=dict(
+            title_font=dict(size=16),
+            tickfont=dict(size=14),
+            showgrid=True,
+            gridwidth=1,
+            gridcolor="lightgrey",
+        ),
+        yaxis=dict(
+            title_font=dict(size=16),
+            tickfont=dict(size=14),
+            showgrid=True,
+            gridwidth=1,
+            gridcolor="lightgrey",
+            exponentformat="e",
+            showexponent="all",
+        ),
+    )
+
+    if calculate_leakage:
+        with col2:
+            leakage_stats = calculate_current_difference(df_top_edge, first_n_points, last_n_points)
+            # st.write(f"Start: **{leakage_stats['start']:.2e}** A, End: **{leakage_stats['end']:.2e}** A, Difference: **{leakage_stats['difference']:.2e}** A")
+        
+        fig.add_hline(
+            y=leakage_stats['start'],
+            line_dash="dash",
+            line_color="grey",
+            annotation_text=f"Start: {leakage_stats['start']:.2e} A",
+            annotation_position="bottom right",
+        )
+        fig.add_hline(
+            y=leakage_stats['end'],
+            line_dash="dash",
+            line_color="grey",
+            annotation_text=f"End: {leakage_stats['end']:.2e} A",
+            annotation_position="top right",
         )
 
-        df_top_edge = df.iloc[(pulse_start_index + left_edge_margin) : (pulse_end_index - right_edge_margin)]
-        if show_top_edge:
-            fig.add_trace(
-                go.Scatter(
-                    x=df_top_edge["Aligned_time (s)"],
-                    y=df_top_edge["Current (A)"],
-                    mode="markers+lines",
-                    name="Top Edge",
-                    line=dict(color=colors[1]),
-                    marker=dict(color=colors[1]),
-                )
-            )
-
-        df_falling_edge = df.iloc[(pulse_end_index + falling_edge_margin) : (pulse_end_index + n_time_points)]
-        if show_falling_edge:
-            fig.add_trace(
-                go.Scatter(
-                    x=df_falling_edge["Aligned_time (s)"],
-                    y=df_falling_edge["Current (A)"],
-                    mode="markers+lines",
-                    name="Falling Edge",
-                    line=dict(color=colors[2]),
-                    marker=dict(color=colors[2]),
-                )
-            )
-        # Update layout
-        fig.update_layout(
-            title=uploaded_file.name,
-            xaxis_title="Aligned Time (s)",
-            yaxis_title="Current (A)",
-            height=600,
-            xaxis=dict(
-                title_font=dict(size=16),
-                tickfont=dict(size=14),
-                showgrid=True,
-                gridwidth=1,
-                gridcolor="lightgrey",
-            ),
-            yaxis=dict(
-                title_font=dict(size=16),
-                tickfont=dict(size=14),
-                showgrid=True,
-                gridwidth=1,
-                gridcolor="lightgrey",
-                exponentformat="e",
-                showexponent="all",
-            ),
-        )
-
-        if calculate_leakage:
-            with col2:
-                leakage_stats = calculate_current_difference(df_top_edge, first_n_points, last_n_points)
-                # st.write(leakage_stats)
-                st.write(f"Start: **{leakage_stats['start']:.2e}** A, End: **{leakage_stats['end']:.2e}** A, Difference: **{leakage_stats['difference']:.2e}** A")
-            
+    if calculate_afterglow:
+        afterglow_stats = calculate_falling_time(df_falling_edge, percent_drop=percent_drop_input)
+        if afterglow_stats is not None:  # Only add lines if calculation was successful
+            # with col1:
+            #     st.write(f"Falling Time at {percent_drop_input*100}% Drop = {afterglow_stats['time_drop']*1e3:.2f} ms")
             fig.add_hline(
-                y=leakage_stats['start'],
+                y=afterglow_stats['threshold_drop'],
                 line_dash="dash",
                 line_color="grey",
-                annotation_text=f"Start: {leakage_stats['start']:.2e} A",
-                annotation_position="bottom right",
-            )
-            fig.add_hline(
-                y=leakage_stats['end'],
-                line_dash="dash",
-                line_color="grey",
-                annotation_text=f"End: {leakage_stats['end']:.2e} A",
+                annotation_text=f"{percent_drop_input*100}% Drop: {afterglow_stats['threshold_drop']:.2e} A",
                 annotation_position="top right",
             )
+            fig.add_vline(
+                x=afterglow_stats['time_index'],
+                line_dash="dash",
+                line_color="grey",
+                annotation_text=f"Time Drop: {afterglow_stats['time_drop']*1e3:.2f} ms",
+                annotation_position="bottom right",
+            )
 
-        if calculate_afterglow:
-            afterglow_stats = calculate_falling_time(df_falling_edge, percent_drop=percent_drop_input)
-            if afterglow_stats is not None:  # Only add lines if calculation was successful
-                with col1:
-                    st.write(f"Falling Time at {percent_drop_input*100}% Drop = {afterglow_stats['time_drop']*1e3:.2f} ms")
-                fig.add_hline(
-                    y=afterglow_stats['threshold_drop'],
-                    line_dash="dash",
-                    line_color="grey",
-                    annotation_text=f"{percent_drop_input*100}% Drop: {afterglow_stats['threshold_drop']:.2e} A",
-                    annotation_position="top right",
-                )
-                fig.add_vline(
-                    x=afterglow_stats['time_index'],
-                    line_dash="dash",
-                    line_color="grey",
-                    annotation_text=f"Time Drop: {afterglow_stats['time_drop']*1e3:.2f} ms",
-                    annotation_position="bottom right",
-                )
+    # Display main plot
+    with st.expander("Full Curve", expanded=True):
+        st.plotly_chart(fig, use_container_width=True)
 
-        # Display main plot
-        with st.expander("Full Curve", expanded=True):
-            st.plotly_chart(fig, use_container_width=True)
-
-        curve_fit_falling_edge = st.checkbox("Curve Fit Falling Edge", value=False, key=f"curve_fit_{uploaded_file.name}")
-        # Show fits if requested
-        if curve_fit_falling_edge:
-            st.subheader("Falling Edge Analysis")
-
+    stats = {'file_name': file_name, 
+             'Device ID': df.iloc[0]['Device ID'],
+             'Contact ID': df.iloc[0]['Contact ID'],
+             'photocurrent_start': leakage_stats['start'], 
+             'photocurrent_end': leakage_stats['end'], 
+             'leakage_current': leakage_stats['difference'], 
+             'percent_drop_threshold': percent_drop_input, 
+             'afterglow_time_ms': afterglow_stats['time_drop']*1e3,
+             'afterglow_time': afterglow_stats['time_drop']
+             }
+    stats_df = pd.concat([stats_df, pd.DataFrame([stats])], ignore_index=True)
+    # st.write(stats_df)
+    
+    curve_fit_falling_edge = st.checkbox("Curve Fit Falling Edge", value=False, key=f"curve_fit_{file_name}")
+    # Show fits if requested
+    if curve_fit_falling_edge:
+        with st.expander("Falling Edge Analysis", expanded=True):
             # Create fit plot
             fig_fit = go.Figure()
-
-            # Add data trace
+            # Raw data trace
             fig_fit.add_trace(
                 go.Scatter(
                     x=df_falling_edge["Aligned_time (s)"],
@@ -288,24 +279,25 @@ if uploaded_files:
 
             # Power law fit
             try:
-                popt, _ = curve_fit(
+                popt, pcov = curve_fit(
                     power_law_fit,
                     df_falling_edge["Aligned_time (s)"],
                     df_falling_edge["Current (A)"],
                     p0=(0.1, -1e-7, 5e-8),
                 )
-                a, b, c = popt
+                a, n, c = popt
                 fig_fit.add_trace(
                     go.Scatter(
                         x=df_falling_edge["Aligned_time (s)"],
-                        y=power_law_fit(df_falling_edge["Aligned_time (s)"], a, b, c),
+                        y=power_law_fit(df_falling_edge["Aligned_time (s)"], a, n, c),
                         mode="lines",
-                        name=f"Power Law Fit (n={b:.3f})",
+                        name=f"Power Law Fit (n={n:.3f})",
                     )
                 )
             except:
                 st.warning("Power law fit failed")
-            st.write(f"Power law fit: {a:.5f}, {b:.5f}, {c:.5f}")
+            st.write("Power law equation: I(t) = (t - a)^n + c - a")
+            st.write(f"Power law fit: a={a:.5f}, n={n:.5f}, c={c:.5f}")
             # Exponential fit
             try:
                 popt, _ = curve_fit(
@@ -325,6 +317,8 @@ if uploaded_files:
                 )
             except:
                 st.warning("Exponential fit failed")
+            st.write("Exponential equation: I(t) = exp(-a*t + b) + c")
+            st.write(f"Exponential fit: a={a:.3f}, b={b:.3f}, c={c:.3f}")
 
             # Update fit plot layout
             fig_fit.update_layout(
@@ -352,5 +346,19 @@ if uploaded_files:
 
             # Display fit plot
             st.plotly_chart(fig_fit, use_container_width=True)
-else:
-    st.write("Please upload a CSV file to begin analysis")
+
+with stats_container:
+    # Format numeric columns to scientific notation
+    formatted_df = stats_df.copy()
+    # numeric_columns = stats_df.select_dtypes(include=['float64', 'int64']).columns
+    for col in ['photocurrent_start', 'photocurrent_end', 'leakage_current']:
+        formatted_df[col] = formatted_df[col].apply(lambda x: '{:.2e}'.format(x) if pd.notnull(x) else x)
+    st.write(formatted_df)
+    # Convert DataFrame to CSV for download
+    csv = formatted_df.to_csv(index=False)
+    st.download_button(
+        label="Download data as CSV",
+        data=csv,
+        file_name="leakage_current_stats.csv",
+        mime="text/csv",
+    )
