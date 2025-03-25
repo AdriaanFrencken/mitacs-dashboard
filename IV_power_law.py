@@ -12,6 +12,7 @@ st.title("I-V Power Law Analysis")
 st.caption("Created by: John Feng")
 
 with st.sidebar:
+    show_raw_data = st.checkbox("Show raw data", value=False)
     marker_size = st.slider("Marker size", min_value=1, max_value=10, value=5, step=1)
     line_width = st.slider(
         "Line width", min_value=0.5, max_value=5.0, value=1.0, step=0.5
@@ -50,10 +51,11 @@ for i, data_file in enumerate(data_files):
         np.log10(df["Current (A)"]), np.log10(df["Voltage (V)"])
     )
 
-    with st.expander(f"Raw data for {file_name}"):
-        df["Current (nA)"] = df["Current (A)"] * 1e9
-        df["Power Law Slope"] = power_law_slope
-        st.write(df)
+    df["Current (nA)"] = df["Current (A)"] * 1e9
+    df["Power Law Slope"] = power_law_slope
+    if show_raw_data:
+        with st.expander(f"Raw data for {file_name}"):
+            st.write(df)
 
     with st.sidebar:
         plot_label = st.text_input(f"{file_name}", value=file_name)
