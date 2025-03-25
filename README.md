@@ -61,6 +61,7 @@ Comments in the CSV files should be preceded by '#'.
 - Pandas
 - NumPy
 - Plotly
+- Scipy
 
 ## Contributing
 
