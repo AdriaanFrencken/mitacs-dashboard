@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 import os
-from utils import get_colors, find_pulse_start
+from utils import get_colors, find_pulse_start, data_extractor, extract_filename
 
 st.set_page_config(layout="wide")
 
@@ -41,62 +41,30 @@ with st.sidebar:
     color_scheme = st.selectbox(
         "Color scheme",
         [
+            "Plotly",
             "Set1",
             "Set2",
             "Set3",
             "D3",
             "G10",
             "T10",
-            "Plotly",
-            "Viridis",
-            "Plasma",
-            "Rainbow",
-            "Turbo",
         ],
         index=0,
     )
     st.subheader("Plot labels:")
 
 # Add radio button for data source selection
-data_source = st.radio(
-    "Choose data source", ["Upload CSV", "Load samples"], horizontal=True
-)
-# File uploader
-if data_source == "Load samples":
-    sample_folder_1 = os.listdir(r"SAMPLES\\TiO2\\I-t")
-    sample_files_1 = [os.path.join(r"SAMPLES\\TiO2\\I-t", f) for f in sample_folder_1]
-    sample_folder_2 = os.listdir(r"SAMPLES\\CdS\\I-t")
-    sample_files_2 = [os.path.join(r"SAMPLES\\CdS\\I-t", f) for f in sample_folder_2]
-    all_sample_files = sample_files_1 + sample_files_2
-    selected_sample_files = st.multiselect(
-        "Select sample files", options=all_sample_files, default=all_sample_files,
-        label_visibility="visible", help="Select the sample file for analysis"
-    )
-    data_files = selected_sample_files
-
-elif data_source == "Upload CSV":
-    uploaded_files = st.file_uploader(
-        "Upload CSV files", type=["csv"], accept_multiple_files=True
-    )
-    if uploaded_files:
-        data_files = uploaded_files
-    else:
-        st.warning("Please upload CSV files to begin analysis")
-        st.stop()
+data_source, data_files = data_extractor(measurement_type="I-t")
 
 # Create a figure for all curves
 fig = go.Figure()
 
 # Get color sequence based on selection
-n_files = len(data_files)
-colors = get_colors(n_files, color_scheme)
+colors = get_colors(len(data_files), color_scheme)
 
 # Process each uploaded file
 for idx, data_file in enumerate(data_files):
-    if data_source == "Load samples":
-        file_name = data_file.split("\\")[-1].split(".")[0]
-    elif data_source == "Upload CSV":
-        file_name = data_file.name
+    file_name = extract_filename(data_source, data_file)
 
     color_idx = idx % len(colors)  # Fallback in case we have more files than colors
     # Read the CSV file

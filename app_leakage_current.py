@@ -4,7 +4,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 import os
 import plotly.graph_objects as go
-from utils import get_colors, find_pulse_end, find_pulse_start
+from utils import get_colors, find_pulse_end, find_pulse_start, data_extractor, extract_filename
 from leakage_current_functions import calculate_current_difference, calculate_falling_time, exponential_fit, power_law_fit
 
 st.set_page_config(layout="wide")
@@ -52,27 +52,8 @@ with st.sidebar:
         step=100,
     )
 
-data_source = st.radio(
-    "Choose data source", ["Upload CSV", "Load samples"], horizontal=True
-)
-
-if data_source == "Load samples":
-    sample_folder_1 = os.listdir(r"SAMPLES\\TiO2\\I-t")
-    sample_files_1 = [os.path.join(r"SAMPLES\\TiO2\\I-t", f) for f in sample_folder_1]
-    sample_folder_2= os.listdir(r"SAMPLES\\CdS\\I-t")
-    sample_files_2 = [os.path.join(r"SAMPLES\\CdS\\I-t", f) for f in sample_folder_2]
-    all_sample_files = sample_files_1 + sample_files_2
-    data_files = all_sample_files
-    selected_data_files = st.multiselect("Select data files", options=data_files, default=data_files, label_visibility="visible", help="Select the data file for analysis")
-elif data_source == "Upload CSV":
-    uploaded_files = st.file_uploader("Upload CSV file", type=["csv"], accept_multiple_files=True)
-    if uploaded_files:
-        data_files = uploaded_files
-    else:
-        st.warning("Please upload CSV files to begin analysis")
-        st.stop()
-
-colors = get_colors(10, color_scheme)
+data_source, data_files = data_extractor(measurement_type="I-t")
+colors = get_colors(len(data_files), color_scheme)
 
 with st.expander("Control Panel", expanded=False):
     col1, col2 = st.columns(2)
@@ -101,10 +82,7 @@ with st.expander("Control Panel", expanded=False):
 stats_container = st.container()
 stats_df = pd.DataFrame()
 for idx, data_file in enumerate(data_files):
-    if data_source == "Load samples":
-        file_name = data_file.split("\\")[-1].split(".")[0]
-    elif data_source == "Upload CSV":
-        file_name = data_file.name
+    file_name = extract_filename(data_source, data_file)
 
     # Read the CSV file
     df = pd.read_csv(data_file, comment="#")
