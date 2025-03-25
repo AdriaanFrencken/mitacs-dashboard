@@ -140,7 +140,7 @@ if uploaded_files:
 
     fig_bar = px.bar(
         df_bar_chart,
-        x="Index",
+        x="Device ID",
         y="Current at 1000V",
         color="Device ID",
         color_discrete_map=dict(zip(df_bar_chart["Device ID"], df_bar_chart["Color"])),
