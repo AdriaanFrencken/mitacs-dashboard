@@ -90,7 +90,10 @@ stats_df = pd.DataFrame()
 for idx, data_file in enumerate(data_files):
     file_path = extract_filename(data_source, data_file)
     file_name = get_file_name(file_path)
-    metadata = extract_metadata(data_file)
+    try:
+        metadata = extract_metadata(data_file)
+    except:
+        metadata = {}
 
     # Read the CSV file
     df = pd.read_csv(data_file, comment="#")
@@ -166,8 +169,12 @@ for idx, data_file in enumerate(data_files):
             )
         )
     # Update layout
+    try:
+        plot_title = f"{metadata['Surface Treatment']} Guard-{metadata['Guard Ring']}"
+    except:
+        plot_title = file_name
     fig.update_layout(
-        title=f"{metadata['Surface Treatment']} Guard-{metadata['Guard Ring']}",
+        title=plot_title,
         xaxis_title="Aligned Time (s)",
         yaxis_title="Current (A)",
         height=600,

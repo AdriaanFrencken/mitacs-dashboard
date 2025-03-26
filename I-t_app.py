@@ -70,7 +70,10 @@ colors = get_colors(len(data_files), color_scheme)
 for idx, data_file in enumerate(data_files):
     file_path = extract_filename(data_source, data_file)
     file_name = get_file_name(file_path)
-    metadata = extract_metadata(data_file)
+    try:
+        metadata = extract_metadata(data_file)
+    except:
+        metadata = {}
     
     color_idx = idx % len(colors)  # Fallback in case we have more files than colors
     # Read the CSV file
@@ -95,7 +98,10 @@ for idx, data_file in enumerate(data_files):
     ]
 
     with st.sidebar:
-        plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
+        try:
+            plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
+        except:
+            plot_label = st.text_input(f"Plot {idx+1}", value=f"{file_name}")
 
     fig.add_scatter(
         x=df_slice["Aligned_time (s)"],

@@ -46,7 +46,10 @@ colors = get_colors(len(data_files), color_scheme)
 for idx, data_file in enumerate(data_files):
     file_path = extract_filename(data_source, data_file)
     file_name = get_file_name(file_path)
-    metadata = extract_metadata(data_file)
+    try:
+        metadata = extract_metadata(data_file)
+    except:
+        metadata = {}
     # Read the CSV file
     df = pd.read_csv(data_file, comment="#")
     # Filter for positive voltages
@@ -65,7 +68,10 @@ for idx, data_file in enumerate(data_files):
             st.write(df)
 
     with st.sidebar:
-        plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
+        try:
+            plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
+        except:
+            plot_label = st.text_input(f"Plot {idx+1}", value=f"{file_name}")
 
     # Add IV curve trace on primary y-axis
     fig.add_trace(

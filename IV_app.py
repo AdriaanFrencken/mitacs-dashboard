@@ -46,30 +46,16 @@ df_bar_chart = pd.DataFrame()
 for idx, data_file in enumerate(data_files):
     file_path = extract_filename(data_source, data_file)
     file_name = get_file_name(file_path)
-    metadata = extract_metadata(data_file)
+    
+    try:
+        metadata = extract_metadata(data_file)
+    except:
+        metadata = {}
+        
     # Read the CSV file
     df = pd.read_csv(data_file, comment="#")
     # Calculate first derivative
     df = calculate_first_derivative(df)
-
-    current_at_1000V = df[df["Voltage (V)"] == 1000]["Current (A)"]
-    df_bar_chart = pd.concat(
-        [
-            df_bar_chart,
-            pd.DataFrame(
-                {
-                    "Index": [idx],
-                    "File Name": file_name,
-                    "Device ID": df["Device ID"].iloc[0],
-                    "Contact ID": df["Contact ID"].iloc[0],
-                    "Current at 1000V": current_at_1000V,
-                    "Color": colors[idx],
-                    "Surface Treatment": metadata["Surface Treatment"],
-                    "Guard Ring": metadata["Guard Ring"],
-                }
-            ),
-        ]
-    )
 
     if only_positive_voltage:
         df = df[df["Voltage (V)"] > 0]
@@ -77,7 +63,10 @@ for idx, data_file in enumerate(data_files):
         df = df[df["Voltage (V)"] < 0]
 
     with st.sidebar:
-        plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
+        try:
+            plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
+        except:
+            plot_label = st.text_input(f"Plot {idx+1}", value=f"{file_name}")
 
     fig.add_scatter(
         x=df["Voltage (V)"],
@@ -127,17 +116,51 @@ for idx, data_file in enumerate(data_files):
             showexponent="all",  # Grid line spacing
         ),
     )
-
-    # Display the plot with full width
-    # with container_1:
+    if "Surface Treatment" in metadata:
+        current_at_1000V = df[df["Voltage (V)"] == 1000]["Current (A)"]
+        df_bar_chart = pd.concat(
+            [
+            df_bar_chart,
+            pd.DataFrame(
+                {
+                    "Index": [idx],
+                    "File Name": file_name,
+                    "Device ID": df["Device ID"].iloc[0],
+                    "Contact ID": df["Contact ID"].iloc[0],
+                    "Current at 1000V": current_at_1000V,
+                    "Color": colors[idx],
+                    "Surface Treatment": metadata["Surface Treatment"],
+                    "Guard Ring": metadata["Guard Ring"],
+                }
+            ),
+            ]
+        )
+    else:
+        current_at_1000V = df[df["Voltage (V)"] == 1000]["Current (A)"]
+        df_bar_chart = pd.concat(
+            [
+            df_bar_chart,
+            pd.DataFrame(
+                {
+                    "Index": [idx],
+                    "File Name": file_name,
+                    "Device ID": df["Device ID"].iloc[0],
+                    "Contact ID": df["Contact ID"].iloc[0],
+                    "Current at 1000V": current_at_1000V,
+                    "Color": colors[idx],
+                }
+            ),
+            ]
+        )
+        
 st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
 
 with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
     col1, col2 = st.columns(2)
     with col1:
-        x_choice = st.radio("X-axis", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"], index=3)
+        x_choice = st.radio("X-axis", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"], index=0)
     with col2:
-        group_choice = st.radio("Group by", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"], index=2)
+        group_choice = st.radio("Group by", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"], index=1)
     fig_bar = px.bar(
         df_bar_chart,
         x=x_choice,
