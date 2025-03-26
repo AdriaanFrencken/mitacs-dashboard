@@ -4,7 +4,12 @@ import numpy as np
 import os
 import plotly.graph_objects as go
 import plotly.express as px
-from utils import get_colors, calculate_first_derivative, data_extractor, extract_filename
+from utils import (get_colors, 
+                   calculate_first_derivative, 
+                   data_extractor, 
+                   extract_filename,
+                   get_file_name,
+                   extract_metadata)
 
 st.set_page_config(layout="wide")
 
@@ -38,8 +43,10 @@ fig = go.Figure()
 colors = get_colors(len(data_files), color_scheme)
 df_bar_chart = pd.DataFrame()
 
-for i, data_file in enumerate(data_files):
-    file_name = extract_filename(data_source, data_file)
+for idx, data_file in enumerate(data_files):
+    file_path = extract_filename(data_source, data_file)
+    file_name = get_file_name(file_path)
+    metadata = extract_metadata(data_file)
     # Read the CSV file
     df = pd.read_csv(data_file, comment="#")
     # Calculate first derivative
@@ -51,12 +58,14 @@ for i, data_file in enumerate(data_files):
             df_bar_chart,
             pd.DataFrame(
                 {
-                    "Index": [i],
+                    "Index": [idx],
                     "File Name": file_name,
                     "Device ID": df["Device ID"].iloc[0],
                     "Contact ID": df["Contact ID"].iloc[0],
                     "Current at 1000V": current_at_1000V,
-                    "Color": colors[i],
+                    "Color": colors[idx],
+                    "Surface Treatment": metadata["Surface Treatment"],
+                    "Guard Ring": metadata["Guard Ring"],
                 }
             ),
         ]
@@ -68,7 +77,7 @@ for i, data_file in enumerate(data_files):
         df = df[df["Voltage (V)"] < 0]
 
     with st.sidebar:
-        plot_label = st.text_input(f"{file_name}", value=file_name)
+        plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
 
     fig.add_scatter(
         x=df["Voltage (V)"],
@@ -76,7 +85,7 @@ for i, data_file in enumerate(data_files):
         name=plot_label,
         mode="markers+lines",
         line=dict(width=line_width),
-        marker=dict(symbol="circle", size=marker_size, color=colors[i]),
+        marker=dict(symbol="circle", size=marker_size, color=colors[idx]),
     )
 
     # Update layout for better visualization
@@ -126,9 +135,9 @@ st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
 with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
     col1, col2 = st.columns(2)
     with col1:
-        x_choice = st.radio("X-axis", ["File Name", "Device ID", "Contact ID"])
+        x_choice = st.radio("X-axis", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"])
     with col2:
-        group_choice = st.radio("Group by", ["File Name", "Device ID", "Contact ID"])
+        group_choice = st.radio("Group by", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"])
     fig_bar = px.bar(
         df_bar_chart,
         x=x_choice,
@@ -140,8 +149,8 @@ with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
     
     fig_bar.update_layout(
         title="Dark Current at 1000V",
-        height=size_y,  # Make figure taller
-        width=size_x,  # Make figure wider
+        # height=size_y,  # Make figure taller
+        # width=size_x,  # Make figure wider
         showlegend=True,
         bargap=0.15,  # Reduce space between bars in different groups
         bargroupgap=0.1,  # Reduce space between bars in the same group
@@ -155,6 +164,7 @@ with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
         ),
 
         yaxis=dict(
+            title="Current (A) - log scale",
             type="log",  # Set y-axis to logarithmic scale
             exponentformat="e",  # Use scientific notation
             showexponent="all",  # Show exponent for all numbers

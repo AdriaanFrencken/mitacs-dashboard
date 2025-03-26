@@ -94,9 +94,8 @@ for idx, data_file in enumerate(data_files):
     ]
 
     with st.sidebar:
-        plot_label = st.text_input(f"{file_name}", value=file_name)
+        plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
 
-    st.write(f"{metadata['Contact ID'] = }")
     fig.add_scatter(
         x=df_slice["Aligned_time (s)"],
         y=df_slice["Current (A)"],
