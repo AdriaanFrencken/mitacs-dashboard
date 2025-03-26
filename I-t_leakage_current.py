@@ -4,7 +4,13 @@ import numpy as np
 from scipy.optimize import curve_fit
 import os
 import plotly.graph_objects as go
-from utils import get_colors, find_pulse_end, find_pulse_start, data_extractor, extract_filename
+from utils import (get_colors, 
+                   find_pulse_end, 
+                   find_pulse_start, 
+                   data_extractor, 
+                   extract_filename,
+                   get_file_name,
+                   extract_metadata)
 from leakage_current_functions import calculate_current_difference, calculate_falling_time, exponential_fit, power_law_fit
 
 st.set_page_config(layout="wide")
@@ -53,7 +59,7 @@ with st.sidebar:
     )
 
 data_source, data_files = data_extractor(measurement_type="I-t")
-colors = get_colors(len(data_files), color_scheme)
+colors = get_colors(10, color_scheme) # keep it fixed at 10
 
 with st.expander("Control Panel", expanded=False):
     col1, col2 = st.columns(2)
@@ -82,7 +88,9 @@ with st.expander("Control Panel", expanded=False):
 stats_container = st.container()
 stats_df = pd.DataFrame()
 for idx, data_file in enumerate(data_files):
-    file_name = extract_filename(data_source, data_file)
+    file_path = extract_filename(data_source, data_file)
+    file_name = get_file_name(file_path)
+    metadata = extract_metadata(data_file)
 
     # Read the CSV file
     df = pd.read_csv(data_file, comment="#")
@@ -127,7 +135,7 @@ for idx, data_file in enumerate(data_files):
         fig.add_hline(
             y=threshold_current,
             line_dash="dash",
-            line_color="grey",
+            line_color=colors[0],
             annotation_text=f"Threshold: {threshold_current:.2e} A",
             annotation_position="bottom right",
     )
@@ -159,7 +167,7 @@ for idx, data_file in enumerate(data_files):
         )
     # Update layout
     fig.update_layout(
-        title=file_name,
+        title=f"{metadata['Surface Treatment']} Guard-{metadata['Guard Ring']}",
         xaxis_title="Aligned Time (s)",
         yaxis_title="Current (A)",
         height=600,
@@ -189,14 +197,14 @@ for idx, data_file in enumerate(data_files):
         fig.add_hline(
             y=leakage_stats['start'],
             line_dash="dash",
-            line_color="grey",
+            line_color=colors[1],
             annotation_text=f"Start: {leakage_stats['start']:.2e} A",
             annotation_position="bottom right",
         )
         fig.add_hline(
             y=leakage_stats['end'],
             line_dash="dash",
-            line_color="grey",
+            line_color=colors[1],
             annotation_text=f"End: {leakage_stats['end']:.2e} A",
             annotation_position="top right",
         )
@@ -216,7 +224,7 @@ for idx, data_file in enumerate(data_files):
             fig.add_vline(
                 x=afterglow_stats['time_index'],
                 line_dash="dash",
-                line_color="grey",
+                line_color=colors[2],
                 annotation_text=f"Time Drop: {afterglow_stats['time_drop']*1e3:.2f} ms",
                 annotation_position="bottom right",
             )
@@ -237,6 +245,10 @@ for idx, data_file in enumerate(data_files):
              }
     stats_df = pd.concat([stats_df, pd.DataFrame([stats])], ignore_index=True)
     # st.write(stats_df)
+    
+    #########################################################
+    ## SCIPY OPTIMIZE CURVE FIT
+    #########################################################
     
     curve_fit_falling_edge = st.checkbox("Curve Fit Falling Edge", value=False, key=f"curve_fit_{file_name}")
     # Show fits if requested
