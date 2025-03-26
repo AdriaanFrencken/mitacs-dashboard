@@ -4,7 +4,12 @@ import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
 import os
-from utils import get_colors, find_pulse_start, data_extractor, extract_filename
+from utils import (get_colors, 
+                   find_pulse_start, 
+                   data_extractor, 
+                   extract_filename, 
+                   get_file_name,
+                   extract_metadata)
 
 st.set_page_config(layout="wide")
 
@@ -31,9 +36,6 @@ with st.sidebar:
     marker_size = st.slider("Marker size", min_value=1, max_value=10, value=5, step=1)
     line_width = st.slider(
         "Line width", min_value=0.5, max_value=5.0, value=1.0, step=0.5
-    )
-    grid_spacing = st.slider(
-        "Grid spacing (seconds)", min_value=0.1, max_value=1.0, value=0.2, step=0.1
     )
     log_y = st.checkbox("Log y-axis", value=False)
     log_x = st.checkbox("Log x-axis", value=False)
@@ -65,8 +67,10 @@ colors = get_colors(len(data_files), color_scheme)
 
 # Process each uploaded file
 for idx, data_file in enumerate(data_files):
-    file_name = extract_filename(data_source, data_file)
-
+    file_path = extract_filename(data_source, data_file)
+    file_name = get_file_name(file_path)
+    metadata = extract_metadata(data_file)
+    
     color_idx = idx % len(colors)  # Fallback in case we have more files than colors
     # Read the CSV file
     df = pd.read_csv(data_file, comment="#")
@@ -92,6 +96,7 @@ for idx, data_file in enumerate(data_files):
     with st.sidebar:
         plot_label = st.text_input(f"{file_name}", value=file_name)
 
+    st.write(f"{metadata['Contact ID'] = }")
     fig.add_scatter(
         x=df_slice["Aligned_time (s)"],
         y=df_slice["Current (A)"],
@@ -110,7 +115,7 @@ fig.add_hline(
     annotation_position="bottom right",
 )
 # Update layout for better visualization
-fig.update_layout(
+fig.update_layout( # General layout configuration
     showlegend=True,
     legend_title_text="File Name",
     xaxis_title="Time (s)",
@@ -146,7 +151,7 @@ fig.update_layout(
         showexponent="all",
     ),
 )
-fig.update_layout(
+fig.update_layout( # Legend configuration
     legend=dict(
         yanchor="bottom",
         y=0.99,
@@ -159,5 +164,4 @@ fig.update_layout(
 
 # Display the plot with full width
 st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
-# else:
-#     st.write("Please upload CSV files to begin analysis")
+

@@ -4,7 +4,6 @@ import numpy as np
 import os
 import streamlit as st
 
-
 def get_colors(n_files, color_scheme):
     # qualitative color schemes
     if color_scheme == 'Plotly':
@@ -32,7 +31,6 @@ def get_colors(n_files, color_scheme):
         colors = px.colors.qualitative.D3
     return colors[::max(1, len(colors)//n_files)][:n_files]
 
-
 def find_pulse_start(df: pd.DataFrame, pulse_start_current: float = 1e-7) -> tuple[int, float]:
     filter = df['Current (A)'] > pulse_start_current
     if filter.any():
@@ -57,7 +55,6 @@ def find_pulse_end(df: pd.DataFrame, threshold_current: float = 2e-6,
     else:
         return df.index[-1], df.loc[df.index[-1], 'Time (s)']
     
-
 def calculate_first_derivative(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate the first derivative of a log-log plot of current vs voltage.
@@ -73,17 +70,9 @@ def data_extractor(measurement_type: str):
         index=1
     )
     if measurement_type == "I-V":
-        sample_folder_1 = os.listdir(r"SAMPLES/TiO2/I-V")
-        sample_files_1 = [os.path.join(r"SAMPLES/TiO2/I-V", f) for f in sample_folder_1]
-        sample_folder_2 = os.listdir(r"SAMPLES/CdS/I-V")
-        sample_files_2 = [os.path.join(r"SAMPLES/CdS/I-V", f) for f in sample_folder_2]
-        all_sample_files = sample_files_1 + sample_files_2
+        all_sample_files = get_sample_data(measurement_type, r"SAMPLES")
     elif measurement_type == "I-t":
-        sample_folder_1 = os.listdir(r"SAMPLES/TiO2/I-t")
-        sample_files_1 = [os.path.join(r"SAMPLES/TiO2/I-t", f) for f in sample_folder_1]
-        sample_folder_2 = os.listdir(r"SAMPLES/CdS/I-t")
-        sample_files_2 = [os.path.join(r"SAMPLES/CdS/I-t", f) for f in sample_folder_2]
-        all_sample_files = sample_files_1 + sample_files_2
+        all_sample_files = get_sample_data(measurement_type, r"SAMPLES")
     else:
         st.error("Invalid measurement type")
         st.stop()
@@ -106,10 +95,50 @@ def data_extractor(measurement_type: str):
     
     return data_source, data_files
 
+def get_sample_data(measurement_type: str, folder_path: str):
+    if measurement_type == "I-V":
+        # Walk through directory and subdirectories for files that start with "I-V"
+        sample_IV = []
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                if file.startswith("I-V"):
+                    sample_IV.append(os.path.join(root, file))
+        return sample_IV
+    elif measurement_type == "I-t":
+        # Walk through directory and subdirectories for files that start with "I-t"
+        sample_It = []
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                if file.startswith("I-t"):
+                    sample_It.append(os.path.join(root, file))
+        return sample_It
+    else:
+        raise ValueError("Invalid measurement type")
+
+def get_file_name(file_path: str) -> str:
+    return file_path.split("\\")[-1].split(".")[0]
+
 def extract_filename(data_source, data_file):
     if data_source == "Load samples":
         file_name = data_file.split("/")[-1].split(".")[0]
     elif data_source == "Upload CSV":
         file_name = data_file.name
     return file_name
-    
+
+def extract_metadata(csv_file: str) -> dict:
+    metadata = {}
+    with open(csv_file, 'r') as file:
+        for line in file:
+            if line.startswith("#"):
+                key, value = line.strip("#").split(":")
+                metadata[key.strip()] = value.strip()
+    return metadata
+
+if __name__ == "__main__":
+    # csv_file = r"SAMPLES/TiO2/I-t/I-t_31AF25_guardedtest_5800mV10kR_guarded_centerpixel_10min_2025-03-18_1.csv"
+    # metadata = extract_metadata(csv_file)
+    # for key, value in metadata.items():
+    #     print(f"{key} = {value}")
+    all_sample_files = get_sample_data("I-t", r"SAMPLES")
+    print(type(all_sample_files))
+
