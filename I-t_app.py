@@ -21,6 +21,7 @@ st.caption("Created by: John Feng")
 with st.sidebar:
     show_raw_data = st.checkbox("Show raw data", value=False)
     align_pulse_start = st.checkbox("Align pulse start", value=True)
+    show_threshold_line = st.checkbox("Show current threshold line", value=True)
     if align_pulse_start:
         time_min, time_max = st.slider(
             "Time range", min_value=-1.0, max_value=10.0, value=(-0.2, 1.8), step=0.1
@@ -106,13 +107,14 @@ for idx, data_file in enumerate(data_files):
     )
 
 # Add horizontal line for threshold current
-fig.add_hline(
-    y=threshold_input * 1e-9,
-    line_dash="dash",
-    line_color="grey",
-    annotation_text=f"Threshold: {threshold_input} nA",
-    annotation_position="bottom right",
-)
+if show_threshold_line:
+    fig.add_hline(
+        y=threshold_input * 1e-9,
+        line_dash="dash",
+        line_color="grey",
+        annotation_text=f"Threshold: {threshold_input} nA",
+        annotation_position="bottom right",
+    )
 # Update layout for better visualization
 fig.update_layout( # General layout configuration
     showlegend=True,
