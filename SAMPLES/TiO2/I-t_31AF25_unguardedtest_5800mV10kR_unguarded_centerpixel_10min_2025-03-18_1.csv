@@ -7,6 +7,10 @@
 #	Sampling Rate (NPLC): 0.01
 #	Voltage (V): 1000
 #	Wait Time (min): 10
+#	Surface Treatment: TiO2
+#	Guard Ring: False
+#	Probe Location: center_pixel
+#	Red LED settings: {5.8V, 10kR}
 #Data:
 Device ID,Contact ID,Voltage (V),Current (A),Time (s)
 31AF25_unguardedtest_5800mV10kR,unguarded_centerpixel_10min,1000.0,7.868948e-09,0

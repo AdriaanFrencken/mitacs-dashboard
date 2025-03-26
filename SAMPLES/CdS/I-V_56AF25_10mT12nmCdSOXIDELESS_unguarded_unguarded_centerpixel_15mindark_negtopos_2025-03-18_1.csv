@@ -12,6 +12,10 @@
 #	Minimum Voltage: -1000
 #	Enable Temperature Control? (Y/N): N
 #	Setpoint Temperature: 25
+#	Surface Treatment: CdS_10mTorr_12nm
+#	Voltage Sweep Direction: neg-to-pos
+#	Guard Ring: False
+#	Probe Location: center_pixel
 #Data:
 Device ID,Contact ID,Temperature (C),Voltage (V),Current (A),Current Std (A)
 56AF25_10mT12nmCdSOXIDELESS_unguarded,unguarded_centerpixel_15mindark_negtopos,nan,-1000.0,0.0001,5.45318e-11

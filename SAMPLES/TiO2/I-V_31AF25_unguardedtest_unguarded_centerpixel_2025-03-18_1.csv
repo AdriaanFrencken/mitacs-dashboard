@@ -12,6 +12,10 @@
 #	Minimum Voltage: -1000
 #	Enable Temperature Control? (Y/N): N
 #	Setpoint Temperature: 25
+#	Surface Treatment: TiO2
+#	Voltage Sweep Direction: neg-to-pos
+#	Guard Ring: False
+#	Probe Location: center_pixel
 #Data:
 Device ID,Contact ID,Temperature (C),Voltage (V),Current (A),Current Std (A)
 31AF25_unguardedtest,unguarded_centerpixel,nan,-1000.0,4.269e-06,2.43855e-08

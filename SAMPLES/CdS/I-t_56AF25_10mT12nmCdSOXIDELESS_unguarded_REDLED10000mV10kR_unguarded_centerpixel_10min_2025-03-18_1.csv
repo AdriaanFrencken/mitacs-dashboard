@@ -7,6 +7,10 @@
 #	Sampling Rate (NPLC): 0.01
 #	Voltage (V): 1000
 #	Wait Time (min): 10
+#	Surface Treatment: CdS_10mTorr_12nm
+#	Guard Ring: False
+#	Probe Location: center_pixel
+#	Red LED settings: {10.0V, 10kR}
 #Data:
 Device ID,Contact ID,Voltage (V),Current (A),Time (s)
 56AF25_10mT12nmCdSOXIDELESS_unguarded_REDLED10000mV10kR,unguarded_centerpixel_10min,1000.0,2.516463e-07,0
