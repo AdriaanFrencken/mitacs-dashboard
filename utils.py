@@ -73,16 +73,16 @@ def data_extractor(measurement_type: str):
         index=1
     )
     if measurement_type == "I-V":
-        sample_folder_1 = os.listdir(r"SAMPLES\\TiO2\\I-V")
-        sample_files_1 = [os.path.join(r"SAMPLES\\TiO2\\I-V", f) for f in sample_folder_1]
-        sample_folder_2 = os.listdir(r"SAMPLES\\CdS\\I-V")
-        sample_files_2 = [os.path.join(r"SAMPLES\\CdS\\I-V", f) for f in sample_folder_2]
+        sample_folder_1 = os.listdir(r"SAMPLES/TiO2/I-V")
+        sample_files_1 = [os.path.join(r"SAMPLES/TiO2/I-V", f) for f in sample_folder_1]
+        sample_folder_2 = os.listdir(r"SAMPLES/CdS/I-V")
+        sample_files_2 = [os.path.join(r"SAMPLES/CdS/I-V", f) for f in sample_folder_2]
         all_sample_files = sample_files_1 + sample_files_2
     elif measurement_type == "I-t":
-        sample_folder_1 = os.listdir(r"SAMPLES\\TiO2\\I-t")
-        sample_files_1 = [os.path.join(r"SAMPLES\\TiO2\\I-t", f) for f in sample_folder_1]
-        sample_folder_2 = os.listdir(r"SAMPLES\\CdS\\I-t")
-        sample_files_2 = [os.path.join(r"SAMPLES\\CdS\\I-t", f) for f in sample_folder_2]
+        sample_folder_1 = os.listdir(r"SAMPLES/TiO2/I-t")
+        sample_files_1 = [os.path.join(r"SAMPLES/TiO2/I-t", f) for f in sample_folder_1]
+        sample_folder_2 = os.listdir(r"SAMPLES/CdS/I-t")
+        sample_files_2 = [os.path.join(r"SAMPLES/CdS/I-t", f) for f in sample_folder_2]
         all_sample_files = sample_files_1 + sample_files_2
     else:
         st.error("Invalid measurement type")
@@ -108,7 +108,7 @@ def data_extractor(measurement_type: str):
 
 def extract_filename(data_source, data_file):
     if data_source == "Load samples":
-        file_name = data_file.split("\\")[-1].split(".")[0]
+        file_name = data_file.split("/")[-1].split(".")[0]
     elif data_source == "Upload CSV":
         file_name = data_file.name
     return file_name
