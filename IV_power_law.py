@@ -2,7 +2,12 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-from utils import get_colors, calculate_first_derivative, data_extractor, extract_filename
+from utils import (get_colors, 
+                   calculate_first_derivative, 
+                   data_extractor, 
+                   extract_filename,
+                   get_file_name,
+                   extract_metadata)
 from plotly.subplots import make_subplots
 
 st.set_page_config(layout="wide")
@@ -38,8 +43,10 @@ fig2 = go.Figure()
 colors = get_colors(len(data_files), color_scheme)
 
 # Process each uploaded file
-for i, data_file in enumerate(data_files):
-    file_name = extract_filename(data_source, data_file)
+for idx, data_file in enumerate(data_files):
+    file_path = extract_filename(data_source, data_file)
+    file_name = get_file_name(file_path)
+    metadata = extract_metadata(data_file)
     # Read the CSV file
     df = pd.read_csv(data_file, comment="#")
     # Filter for positive voltages
@@ -58,7 +65,7 @@ for i, data_file in enumerate(data_files):
             st.write(df)
 
     with st.sidebar:
-        plot_label = st.text_input(f"{file_name}", value=file_name)
+        plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
 
     # Add IV curve trace on primary y-axis
     fig.add_trace(
@@ -68,7 +75,7 @@ for i, data_file in enumerate(data_files):
             name=f"{plot_label} - IV",
             mode="markers+lines",
             line=dict(width=line_width),
-            marker=dict(symbol="circle", size=marker_size, color=colors[i]),
+            marker=dict(symbol="circle", size=marker_size, color=colors[idx]),
         ),
         secondary_y=False,
     )
@@ -80,7 +87,7 @@ for i, data_file in enumerate(data_files):
             name=f"{plot_label} - Slope",
             mode="markers+lines",
             line=dict(width=line_width, dash="dot"),
-            marker=dict(symbol="circle", size=marker_size, color=colors[i]),
+            marker=dict(symbol="circle", size=marker_size, color=colors[idx]),
         )
     )
 
@@ -93,7 +100,7 @@ for i, data_file in enumerate(data_files):
                 name=f"{plot_label} - Slope",
                 mode="markers+lines",
                 line=dict(width=line_width, dash="dot"),
-                marker=dict(symbol="circle", size=marker_size, color=colors[i]),
+                marker=dict(symbol="circle", size=marker_size, color=colors[idx]),
             ),
             secondary_y=True,
         )
@@ -188,3 +195,5 @@ with st.expander("IV Curves", expanded=True):
     st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
 with st.expander("Power Law Slope", expanded=False):
     st.plotly_chart(fig2, use_container_width=True, config={"responsive": True})
+
+
