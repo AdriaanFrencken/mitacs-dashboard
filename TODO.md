@@ -7,4 +7,7 @@
 
 ## App features
 * Capture raw current and absolute current in data.
-* Record the `dark_current_1000V` and `peak_photocurrent` in new data table
+* Calculate the mean stable `dark_current_start` and `dark_current_end` 
+* Calculate the noise or RMS value of `dark_current_start`, `dark_current_end`, `photocurrent_end`,
+* If possible, do a fast fourier transform to extract noise frequencies.
+* Add colors or distinct stylings to the dashed vline and hline
