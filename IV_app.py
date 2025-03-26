@@ -135,9 +135,9 @@ st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
 with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
     col1, col2 = st.columns(2)
     with col1:
-        x_choice = st.radio("X-axis", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"])
+        x_choice = st.radio("X-axis", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"], index=3)
     with col2:
-        group_choice = st.radio("Group by", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"])
+        group_choice = st.radio("Group by", ["Device ID", "Contact ID", "Surface Treatment", "Guard Ring"], index=2)
     fig_bar = px.bar(
         df_bar_chart,
         x=x_choice,
