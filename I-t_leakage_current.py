@@ -222,7 +222,7 @@ for idx, data_file in enumerate(data_files):
             # with col1:
             #     st.write(f"Falling Time at {percent_drop_input*100}% Drop = {afterglow_stats['time_drop']*1e3:.2f} ms")
             fig.add_hline(
-                y=afterglow_stats['threshold_drop'],
+                y=afterglow_stats['threshold_drop']+afterglow_stats['end_current'],
                 line_dash="dash",
                 line_color="grey",
                 annotation_text=f"{percent_drop_input*100}% Drop: {afterglow_stats['threshold_drop']:.2e} A",
