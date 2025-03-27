@@ -20,18 +20,18 @@ def calculate_falling_time(df_falling_edge, percent_drop=0.98):
     """Calculate the time it takes for the current to drop to a certain percentage of its initial value.
     """
     try:
-        current_A = df_falling_edge["Current (A)"].iloc[0]
-        current_B = df_falling_edge["Current (A)"].iloc[-10:].mean()
-        initial_current = abs(current_A - current_B)
+        start_current = df_falling_edge["Current (A)"].iloc[0]
+        end_current = df_falling_edge["Current (A)"].iloc[-10:].mean()
+        initial_current = abs(start_current - end_current)
         threshold_drop = initial_current * (1.0-percent_drop)
         
         first_index = df_falling_edge.index[0]
         last_index = df_falling_edge.index[-1]
         # st.write(f"First index: {first_index}, Last index: {last_index} of Falling Edge")
         # Find the first index where current drops below threshold
-        threshold_indices = df_falling_edge[df_falling_edge["Current (A)"] <= threshold_drop].index
+        threshold_indices = df_falling_edge[df_falling_edge["Current (A)"] <= (threshold_drop+end_current)].index
         if len(threshold_indices) == 0:
-            st.warning("Fall time too fast to resolve.")
+            st.warning("Could not find current below drop threshold.")
             afterglow_stats = {'threshold_drop': threshold_drop, 'time_index': 0, 'time_drop': 0}
             return afterglow_stats
             
@@ -39,7 +39,7 @@ def calculate_falling_time(df_falling_edge, percent_drop=0.98):
         # st.write(f"Threshold index: {threshold_index}")
         time_index = df_falling_edge["Aligned_time (s)"].iloc[threshold_index-first_index]
         time_drop = time_index - df_falling_edge["Aligned_time (s)"].iloc[0]
-        afterglow_stats = {'threshold_drop': threshold_drop, 'time_index': time_index, 'time_drop': time_drop}
+        afterglow_stats = {'threshold_drop': threshold_drop, 'time_index': time_index, 'time_drop': time_drop, 'end_current': end_current}
         
         return afterglow_stats
     except Exception as e:
