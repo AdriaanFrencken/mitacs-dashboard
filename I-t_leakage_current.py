@@ -62,30 +62,27 @@ data_source, data_files = data_extractor(measurement_type="I-t")
 colors = get_colors(10, color_scheme) # keep it fixed at 10
 
 with st.expander("Control Panel", expanded=False):
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
     with col1:
-        c1, c2 = st.columns(2)
-        with c1:
-            show_top_edge = st.checkbox("Overlay Top Edge", value=True)
-            show_falling_edge = st.checkbox("Overlay Falling Edge", value=True)
-        with c2:
-            show_threshold_line = st.checkbox("Current Threshold Line", value=True)
-            show_pulse_end_line = st.checkbox("Pulse End Line", value=True)
+        show_top_edge = st.checkbox("Overlay Top Edge", value=True)
+        show_falling_edge = st.checkbox("Overlay Falling Edge", value=True)
+        show_threshold_line = st.checkbox("Current Threshold Line", value=True)
+        show_pulse_end_line = st.checkbox("Pulse End Line", value=True)
     with col2:
+        calculate_afterglow = st.checkbox("Calculate Falling Time of Afterglow", value=True)
+        percent_drop_input = st.number_input("Percent Drop", min_value=0.80, max_value=1.0, value=0.98, step=0.01)
+    
+    with col3:
         calculate_leakage = st.checkbox("Calculate Leakage Current", value=True)
         c1, c2 = st.columns(2)
         with c1:
             first_n_points = st.number_input("First n Points to average", min_value=1, max_value=100, value=10, step=1)
         with c2:
             last_n_points = st.number_input("Last n Points to average", min_value=1, max_value=100, value=10, step=1)
-    with col1:
-        c1, c2 = st.columns(2)
-        with c1:
-            calculate_afterglow = st.checkbox("Calculate Falling Time of Afterglow", value=True)
-        with c2:
-            percent_drop_input = st.number_input("Percent Drop", min_value=0.80, max_value=1.0, value=0.98, step=0.01)
+
+with st.expander("Leakage Current Analysis Data", expanded=False):
+    stats_container = st.container()
     
-stats_container = st.container()
 stats_df = pd.DataFrame()
 for idx, data_file in enumerate(data_files):
     file_path = extract_filename(data_source, data_file)
@@ -245,9 +242,9 @@ for idx, data_file in enumerate(data_files):
             'Contact ID': df.iloc[0]['Contact ID'],
             }
     if 'leakage_stats' in locals() and leakage_stats is not None:
-        stats['photocurrent_start'] = np.round(leakage_stats['start'], 2)
-        stats['photocurrent_end'] = np.round(leakage_stats['end'], 2)
-        stats['leakage_current'] = np.round(leakage_stats['difference'], 2)
+        stats['photocurrent_start'] = f"{leakage_stats['start']:.2e}"
+        stats['photocurrent_end'] = f"{leakage_stats['end']:.2e}" 
+        stats['leakage_current'] = f"{leakage_stats['difference']:.2e}"
         stats['percent_drop_threshold'] = percent_drop_input
     if 'afterglow_stats' in locals() and afterglow_stats is not None:
         stats['afterglow_time_ms'] = np.round(afterglow_stats['time_drop']*1e3, 2)
