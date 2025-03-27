@@ -241,17 +241,19 @@ for idx, data_file in enumerate(data_files):
         st.plotly_chart(fig, use_container_width=True)
 
     stats = {'file_name': file_name, 
-             'Device ID': df.iloc[0]['Device ID'],
-             'Contact ID': df.iloc[0]['Contact ID'],
-             'photocurrent_start': leakage_stats['start'], 
-             'photocurrent_end': leakage_stats['end'], 
-             'leakage_current': leakage_stats['difference'], 
-             'percent_drop_threshold': percent_drop_input, 
-             'afterglow_time_ms': afterglow_stats['time_drop']*1e3,
-             'afterglow_time': afterglow_stats['time_drop']
-             }
+            'Device ID': df.iloc[0]['Device ID'],
+            'Contact ID': df.iloc[0]['Contact ID'],
+            }
+    if 'leakage_stats' in locals() and leakage_stats is not None:
+        stats['photocurrent_start'] = np.round(leakage_stats['start'], 2)
+        stats['photocurrent_end'] = np.round(leakage_stats['end'], 2)
+        stats['leakage_current'] = np.round(leakage_stats['difference'], 2)
+        stats['percent_drop_threshold'] = percent_drop_input
+    if 'afterglow_stats' in locals() and afterglow_stats is not None:
+        stats['afterglow_time_ms'] = np.round(afterglow_stats['time_drop']*1e3, 2)
+        stats['afterglow_time'] = np.round(afterglow_stats['time_drop'], 5)
+
     stats_df = pd.concat([stats_df, pd.DataFrame([stats])], ignore_index=True)
-    # st.write(stats_df)
     
     #########################################################
     ## SCIPY OPTIMIZE CURVE FIT
@@ -347,9 +349,6 @@ for idx, data_file in enumerate(data_files):
 with stats_container:
     # Format numeric columns to scientific notation
     formatted_df = stats_df.copy()
-    # numeric_columns = stats_df.select_dtypes(include=['float64', 'int64']).columns
-    for col in ['photocurrent_start', 'photocurrent_end', 'leakage_current']:
-        formatted_df[col] = formatted_df[col].apply(lambda x: '{:.2e}'.format(x) if pd.notnull(x) else x)
     st.write(formatted_df)
     # Convert DataFrame to CSV for download
     csv = formatted_df.to_csv(index=False)
