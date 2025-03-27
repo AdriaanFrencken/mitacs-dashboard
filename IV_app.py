@@ -18,15 +18,19 @@ st.title("IV Curve Analysis")
 st.caption("Created by: John Feng")
 
 with st.sidebar:
-    marker_size = st.slider("Marker size", min_value=1, max_value=10, value=5, step=1)
-    line_width = st.slider(
-        "Line width", min_value=0.5, max_value=5.0, value=1.0, step=0.5
-    )
+    st.subheader("Data selection:")
+    convert_absolute_current = st.checkbox("Convert to absolute current", value=True)
     log_x = st.checkbox("Log x-axis", value=False)
     log_y = st.checkbox("Log y-axis", value=True)
     show_legend = st.checkbox("Show legend", value=True)
     only_positive_voltage = st.checkbox("Voltage > 0", value=False)
     only_negative_voltage = st.checkbox("Voltage < 0", value=False)
+    log_bar_chart = st.checkbox("Log y-axis for bar chart", value=True)
+    st.subheader("Plot settings:")
+    marker_size = st.slider("Marker size", min_value=1, max_value=10, value=5, step=1)
+    line_width = st.slider(
+        "Line width", min_value=0.5, max_value=5.0, value=1.0, step=0.5
+    )
     size_x = st.slider("Plot width", min_value=300, max_value=1200, value=800, step=50)
     size_y = st.slider("Plot height", min_value=300, max_value=1200, value=800, step=50)
     fontsize = st.slider("Axis font size", min_value=10, max_value=50, value=20, step=5)
@@ -58,19 +62,29 @@ for idx, data_file in enumerate(data_files):
     df = calculate_first_derivative(df)
 
     if only_positive_voltage:
-        df = df[df["Voltage (V)"] > 0]
+        df_IV = df[df["Voltage (V)"] > 0].copy()
     elif only_negative_voltage:
-        df = df[df["Voltage (V)"] < 0]
+        df_IV = df[df["Voltage (V)"] < 0].copy()
+    elif log_x:
+        df_IV = df[df["Voltage (V)"] > 0].copy()
+    else:
+        df_IV = df.copy()
+
+    if convert_absolute_current:
+        df_IV["Current (A)"] = df["Current (A)"].abs()
 
     with st.sidebar:
         try:
-            plot_label = st.text_input(f"Plot {idx+1}", value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
+            plot_label = st.text_input(f"Plot {idx+1}", 
+                                       value=f"{metadata['Surface Treatment']}_Guard-{metadata['Guard Ring']}")
         except:
-            plot_label = st.text_input(f"Plot {idx+1}", value=f"{file_name}")
+            plot_label = st.text_input(f"Plot {idx+1}", 
+                                       value=f"{file_name}")
+
 
     fig_IV.add_scatter(
-        x=df["Voltage (V)"],
-        y=df["Current (A)"],
+        x=df_IV["Voltage (V)"],
+        y=df_IV["Current (A)"],
         name=plot_label,
         mode="markers+lines",
         line=dict(width=line_width),
@@ -102,7 +116,6 @@ for idx, data_file in enumerate(data_files):
             showgrid=True,  # Show grid lines
             gridwidth=1,  # Grid line width
             gridcolor="lightgrey",  # Grid line color
-            # dtick=grid_spacing         # Grid line spacing
         ),
         yaxis=dict(
             title_font=dict(size=fontsize),  # Increase axis label font size
@@ -111,7 +124,6 @@ for idx, data_file in enumerate(data_files):
             showgrid=True,  # Show grid lines
             gridwidth=1,  # Grid line width
             gridcolor="lightgrey",  # Grid line color
-            # dtick=y_grid_spacing,
             exponentformat="e",
             showexponent="all",  # Grid line spacing
         ),
@@ -172,8 +184,6 @@ with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
     
     fig_bar.update_layout(
         title="Dark Current at 1000V",
-        # height=size_y,  # Make figure taller
-        # width=size_x,  # Make figure wider
         showlegend=True,
         bargap=0.15,  # Reduce space between bars in different groups
         bargroupgap=0.1,  # Reduce space between bars in the same group
@@ -187,8 +197,8 @@ with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
         ),
 
         yaxis=dict(
-            title="Current (A) - log scale",
-            type="log",  # Set y-axis to logarithmic scale
+            title="Current (A) - log scale" if log_bar_chart else "Current (A)",
+            type="log" if log_bar_chart else "linear",  # Set y-axis to logarithmic scale
             exponentformat="e",  # Use scientific notation
             showexponent="all",  # Show exponent for all numbers
             tickfont=dict(size=fontsize * 0.8),  # Increase tick label font size

@@ -18,14 +18,14 @@ st.caption("Created by: John Feng")
 
 with st.sidebar:
     show_raw_data = st.checkbox("Show raw data", value=False)
-    marker_size = st.slider("Marker size", min_value=1, max_value=10, value=5, step=1)
-    line_width = st.slider(
-        "Line width", min_value=0.5, max_value=5.0, value=1.0, step=0.5
-    )
     log_x = st.checkbox("Log x-axis", value=True)
     log_y = st.checkbox("Log y-axis", value=True)
     show_legend = st.checkbox("Show legend", value=True)
     overlay_power_law = st.checkbox("Overlay power law fit", value=False)
+    marker_size = st.slider("Marker size", min_value=1, max_value=10, value=5, step=1)
+    line_width = st.slider(
+        "Line width", min_value=0.5, max_value=5.0, value=1.0, step=0.5
+    )
     size_x = st.slider("Plot width", min_value=300, max_value=1200, value=800, step=50)
     size_y = st.slider("Plot height", min_value=300, max_value=1200, value=800, step=50)
     fontsize = st.slider("Axis font size", min_value=10, max_value=50, value=20, step=5)
@@ -38,8 +38,8 @@ with st.sidebar:
 data_source, data_files = data_extractor(measurement_type="I-V")
 
 # Create a figure with secondary y-axis
-fig_IV = make_subplots(specs=[[{"secondary_y": True}]])
-fig_power_law = go.Figure()
+fig = make_subplots(specs=[[{"secondary_y": True}]])
+fig2 = go.Figure()
 colors = get_colors(len(data_files), color_scheme)
 
 # Process each uploaded file
@@ -74,7 +74,7 @@ for idx, data_file in enumerate(data_files):
             plot_label = st.text_input(f"Plot {idx+1}", value=f"{file_name}")
 
     # Add IV curve trace on primary y-axis
-    fig_IV.add_trace(
+    fig.add_trace(
         go.Scatter(
             x=df["Voltage (V)"],
             y=df["Current (A)"],
@@ -86,7 +86,7 @@ for idx, data_file in enumerate(data_files):
         secondary_y=False,
     )
     
-    fig_power_law.add_trace(
+    fig2.add_trace(
         go.Scatter(
             x=df["Voltage (V)"],
             y=df["Power Law Slope"],
@@ -99,7 +99,7 @@ for idx, data_file in enumerate(data_files):
 
     if overlay_power_law:
         # Add power law slope trace on secondary y-axis
-        fig_IV.add_trace(
+        fig.add_trace(
             go.Scatter(
                 x=df["Voltage (V)"],
                 y=power_law_slope,
@@ -113,7 +113,7 @@ for idx, data_file in enumerate(data_files):
 
 
 # Update layout for better visualization
-fig_IV.update_layout(
+fig.update_layout(
     showlegend=show_legend,
     legend_title_text="Curves",
     title="IV Curves and Power Law Slope",
@@ -130,7 +130,7 @@ fig_IV.update_layout(
 )
 
 # Update x-axis
-fig_IV.update_xaxes(
+fig.update_xaxes(
     title_text="Anode Voltage (V)",
     type="log" if log_x else "linear",
     title_font=dict(size=fontsize),
@@ -141,7 +141,7 @@ fig_IV.update_xaxes(
 )
 
 # Update primary y-axis (Current)
-fig_IV.update_yaxes(
+fig.update_yaxes(
     title_text="Absolute Current (A)",
     type="log" if log_y else "linear",
     title_font=dict(size=fontsize),
@@ -156,7 +156,7 @@ fig_IV.update_yaxes(
 
 if overlay_power_law:
     # Update secondary y-axis (Power Law Slope)
-    fig_IV.update_yaxes(
+    fig.update_yaxes(
         title_text="Power Law Slope (d log(I) / d log(V))",
         title_font=dict(size=fontsize),
         tickfont=dict(size=fontsize * 0.8),
@@ -166,7 +166,7 @@ if overlay_power_law:
         secondary_y=True,
     )
 
-fig_power_law.update_layout(
+fig2.update_layout(
     title="Power Law Slope",
     height=size_y,
     width=size_x,
@@ -178,7 +178,7 @@ fig_power_law.update_layout(
     ),
 )
 
-fig_power_law.update_xaxes(
+fig2.update_xaxes(
     title_text="Anode Voltage (V)",
     type="log" if log_x else "linear",
     title_font=dict(size=fontsize),
@@ -187,7 +187,7 @@ fig_power_law.update_xaxes(
     gridwidth=1,
     gridcolor="lightgrey",
 )
-fig_power_law.update_yaxes(
+fig2.update_yaxes(
     title_text="Power Law Slope (d log(I) / d log(V))",
     title_font=dict(size=fontsize),
     tickfont=dict(size=fontsize * 0.8),
@@ -198,8 +198,8 @@ fig_power_law.update_yaxes(
 
 # Display the plot with full width
 with st.expander("IV Curves", expanded=True):
-    st.plotly_chart(fig_IV, use_container_width=True, config={"responsive": True})
+    st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
 with st.expander("Power Law Slope", expanded=False):
-    st.plotly_chart(fig_power_law, use_container_width=True, config={"responsive": True})
+    st.plotly_chart(fig2, use_container_width=True, config={"responsive": True})
 
 
