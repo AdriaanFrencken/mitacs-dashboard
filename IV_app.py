@@ -39,7 +39,7 @@ with st.sidebar:
 data_source, data_files = data_extractor(measurement_type="I-V")
 
 # Create a figure for all curves
-fig = go.Figure()
+fig_IV = go.Figure()
 colors = get_colors(len(data_files), color_scheme)
 df_bar_chart = pd.DataFrame()
 
@@ -68,7 +68,7 @@ for idx, data_file in enumerate(data_files):
         except:
             plot_label = st.text_input(f"Plot {idx+1}", value=f"{file_name}")
 
-    fig.add_scatter(
+    fig_IV.add_scatter(
         x=df["Voltage (V)"],
         y=df["Current (A)"],
         name=plot_label,
@@ -78,7 +78,7 @@ for idx, data_file in enumerate(data_files):
     )
 
     # Update layout for better visualization
-    fig.update_layout(
+    fig_IV.update_layout(
         showlegend=show_legend,
         legend_title_text="File Name",
         xaxis_title="Anode Voltage (V)",
@@ -153,7 +153,7 @@ for idx, data_file in enumerate(data_files):
             ]
         )
         
-st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
+st.plotly_chart(fig_IV, use_container_width=True, config={"responsive": True})
 
 with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
     col1, col2 = st.columns(2)

@@ -38,8 +38,8 @@ with st.sidebar:
 data_source, data_files = data_extractor(measurement_type="I-V")
 
 # Create a figure with secondary y-axis
-fig = make_subplots(specs=[[{"secondary_y": True}]])
-fig2 = go.Figure()
+fig_IV = make_subplots(specs=[[{"secondary_y": True}]])
+fig_power_law = go.Figure()
 colors = get_colors(len(data_files), color_scheme)
 
 # Process each uploaded file
@@ -74,7 +74,7 @@ for idx, data_file in enumerate(data_files):
             plot_label = st.text_input(f"Plot {idx+1}", value=f"{file_name}")
 
     # Add IV curve trace on primary y-axis
-    fig.add_trace(
+    fig_IV.add_trace(
         go.Scatter(
             x=df["Voltage (V)"],
             y=df["Current (A)"],
@@ -86,7 +86,7 @@ for idx, data_file in enumerate(data_files):
         secondary_y=False,
     )
     
-    fig2.add_trace(
+    fig_power_law.add_trace(
         go.Scatter(
             x=df["Voltage (V)"],
             y=df["Power Law Slope"],
@@ -99,7 +99,7 @@ for idx, data_file in enumerate(data_files):
 
     if overlay_power_law:
         # Add power law slope trace on secondary y-axis
-        fig.add_trace(
+        fig_IV.add_trace(
             go.Scatter(
                 x=df["Voltage (V)"],
                 y=power_law_slope,
@@ -113,7 +113,7 @@ for idx, data_file in enumerate(data_files):
 
 
 # Update layout for better visualization
-fig.update_layout(
+fig_IV.update_layout(
     showlegend=show_legend,
     legend_title_text="Curves",
     title="IV Curves and Power Law Slope",
@@ -130,7 +130,7 @@ fig.update_layout(
 )
 
 # Update x-axis
-fig.update_xaxes(
+fig_IV.update_xaxes(
     title_text="Anode Voltage (V)",
     type="log" if log_x else "linear",
     title_font=dict(size=fontsize),
@@ -141,7 +141,7 @@ fig.update_xaxes(
 )
 
 # Update primary y-axis (Current)
-fig.update_yaxes(
+fig_IV.update_yaxes(
     title_text="Absolute Current (A)",
     type="log" if log_y else "linear",
     title_font=dict(size=fontsize),
@@ -156,7 +156,7 @@ fig.update_yaxes(
 
 if overlay_power_law:
     # Update secondary y-axis (Power Law Slope)
-    fig.update_yaxes(
+    fig_IV.update_yaxes(
         title_text="Power Law Slope (d log(I) / d log(V))",
         title_font=dict(size=fontsize),
         tickfont=dict(size=fontsize * 0.8),
@@ -166,7 +166,7 @@ if overlay_power_law:
         secondary_y=True,
     )
 
-fig2.update_layout(
+fig_power_law.update_layout(
     title="Power Law Slope",
     height=size_y,
     width=size_x,
@@ -178,7 +178,7 @@ fig2.update_layout(
     ),
 )
 
-fig2.update_xaxes(
+fig_power_law.update_xaxes(
     title_text="Anode Voltage (V)",
     type="log" if log_x else "linear",
     title_font=dict(size=fontsize),
@@ -187,7 +187,7 @@ fig2.update_xaxes(
     gridwidth=1,
     gridcolor="lightgrey",
 )
-fig2.update_yaxes(
+fig_power_law.update_yaxes(
     title_text="Power Law Slope (d log(I) / d log(V))",
     title_font=dict(size=fontsize),
     tickfont=dict(size=fontsize * 0.8),
@@ -198,8 +198,8 @@ fig2.update_yaxes(
 
 # Display the plot with full width
 with st.expander("IV Curves", expanded=True):
-    st.plotly_chart(fig, use_container_width=True, config={"responsive": True})
+    st.plotly_chart(fig_IV, use_container_width=True, config={"responsive": True})
 with st.expander("Power Law Slope", expanded=False):
-    st.plotly_chart(fig2, use_container_width=True, config={"responsive": True})
+    st.plotly_chart(fig_power_law, use_container_width=True, config={"responsive": True})
 
 
