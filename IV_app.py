@@ -94,7 +94,7 @@ for idx, data_file in enumerate(data_files):
     # Update layout for better visualization
     fig_IV.update_layout(
         showlegend=show_legend,
-        legend_title_text="File Name",
+        legend_title_text="",
         xaxis_title="Anode Voltage (V)",
         yaxis_title="Absolute Current (A)",
         title="IV Curves for All Files",

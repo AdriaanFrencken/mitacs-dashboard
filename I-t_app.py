@@ -124,7 +124,7 @@ if show_threshold_line:
 # Update layout for better visualization
 fig.update_layout( # General layout configuration
     showlegend=True,
-    legend_title_text="File Name",
+    legend_title_text="",
     xaxis_title="Time (s)",
     yaxis_title="Current (A)",
     title="I-t Curves for All Files",
@@ -133,10 +133,10 @@ fig.update_layout( # General layout configuration
     # Add font settings for axis labels and ticks
     xaxis=dict(
         title_font=dict(
-            size=20, color="black"
+            size=30, color="black"
         ),  # Increase axis label font size and set color
         tickfont=dict(
-            size=16, color="black"
+            size=24, color="black"
         ),  # Increase tick label font size and set color
         showgrid=True,  # Show grid lines
         gridwidth=1,  # Grid line width
@@ -145,10 +145,10 @@ fig.update_layout( # General layout configuration
     ),
     yaxis=dict(
         title_font=dict(
-            size=20, color="black"
+            size=30, color="black"
         ),  # Increase axis label font size and set color
         tickfont=dict(
-            size=16, color="black"
+            size=24, color="black"
         ),  # Increase tick label font size and set color
         type="log" if log_y else "linear",  # Toggle log scale based on checkbox
         showgrid=True,  # Show grid lines
@@ -165,7 +165,7 @@ fig.update_layout( # Legend configuration
         xanchor="right",
         x=0.99,
         bgcolor="rgba(255, 255, 255, 0.8)",  # Semi-transparent white background
-        font=dict(size=16),  # Increase legend font size
+        font=dict(size=24),  # Increase legend font size
     )
 )
 
