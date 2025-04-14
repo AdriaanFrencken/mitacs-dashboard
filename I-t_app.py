@@ -38,6 +38,11 @@ with st.sidebar:
     line_width = st.slider(
         "Line width", min_value=0.5, max_value=5.0, value=1.0, step=0.5
     )
+
+    axis_label_size = st.slider("Axis label size", min_value=10, max_value=50, value=25, step=1)
+    axis_tick_size = st.slider("Axis tick size", min_value=10, max_value=50, value=25, step=1)
+    axis_tick_color = st.color_picker("Axis tick color", value="#000000")
+    
     log_y = st.checkbox("Log y-axis", value=False)
     log_x = st.checkbox("Log x-axis", value=False)
 
@@ -133,10 +138,10 @@ fig.update_layout( # General layout configuration
     # Add font settings for axis labels and ticks
     xaxis=dict(
         title_font=dict(
-            size=30, color="black"
+            size=axis_label_size, color=axis_tick_color
         ),  # Increase axis label font size and set color
         tickfont=dict(
-            size=24, color="black"
+            size=axis_tick_size, color=axis_tick_color
         ),  # Increase tick label font size and set color
         showgrid=True,  # Show grid lines
         gridwidth=1,  # Grid line width
@@ -145,10 +150,10 @@ fig.update_layout( # General layout configuration
     ),
     yaxis=dict(
         title_font=dict(
-            size=30, color="black"
+            size=axis_label_size, color=axis_tick_color
         ),  # Increase axis label font size and set color
         tickfont=dict(
-            size=24, color="black"
+            size=axis_tick_size, color=axis_tick_color
         ),  # Increase tick label font size and set color
         type="log" if log_y else "linear",  # Toggle log scale based on checkbox
         showgrid=True,  # Show grid lines
