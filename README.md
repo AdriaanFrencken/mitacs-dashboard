@@ -1,6 +1,15 @@
-# Mitacs Data Dashboard
+## I-V and Time-Dependent Photocurrent Measurements
 
-A Streamlit web application for analyzing and visualizing IV (Current-Voltage) curves from CSV data files.
+<img src="ASSETS/WaferProber.png" width="400">
+<!-- This application was developed for use with a Keithley 2450 SourceMeter connected to a probe station for semiconductor device characterization: -->
+
+<!-- [Probe Station Setup](ASSETS/ProbeStation.png) -->
+
+
+Current-Voltage (I-V) characterization and time-dependent photocurrent measurements are essential diagnostic tools in semiconductor device development and quality control. I-V curves reveal crucial device parameters such as breakdown voltage, leakage current, and contact resistance, which directly impact device performance and reliability. Time-dependent photocurrent analysis provides insights into carrier dynamics, trapping effects, and photoresponse stability - critical factors for optoelectronic applications like photodetectors and solar cells. Together, these measurements enable researchers and manufacturers to optimize device designs, validate fabrication processes, and ensure consistent performance standards across production batches. In the rapidly evolving semiconductor industry, where device miniaturization and performance demands continue to increase, these characterization techniques remain fundamental for developing next-generation electronic and photonic technologies.
+
+## About this app
+A Streamlit web application for analyzing and visualizing IV (Current-Voltage) and I-t (Current-Time) curves from CSV raw data files.
 
 ## Features
 
@@ -15,7 +24,7 @@ A Streamlit web application for analyzing and visualizing IV (Current-Voltage) c
 - Raw data viewing capability for each uploaded file
 - Responsive plot layout with customizable dimensions
 
-## Installation
+## Local installation
 
 1. Clone this repository:
 ```bash
@@ -27,30 +36,24 @@ git clone <repository-url>
 pip install -r requirements.txt
 ```
 
-## Usage
-
-1. Run the Streamlit app:
+3. Run the Streamlit app:
 ```bash
 streamlit run app.py
 ```
 
-2. Open your web browser and navigate to the provided URL (typically http://localhost:8501)
+4. Open your web browser and navigate to the provided URL (typically http://localhost:8501)
 
-3. Use the application:
-   - Upload one or more CSV files using the file uploader
-   - Adjust visualization parameters in the sidebar:
-     - Toggle pulse start alignment
-     - Set time range for the plot
-     - Adjust threshold current value
-     - Modify marker size and line width
-   - View raw data for each file by expanding the corresponding section
-   - Interact with the plot (zoom, pan, hover for details)
+## Using the application
+  - Upload one or more CSV files using the file uploader
+  - Adjust visualization parameters in the sidebar:
+  - Interact with the plot (zoom, pan, hover for details)
 
 ## Input File Format
 
 The application expects CSV files with the following columns:
-- `Time (s)`: Time values in seconds
-- `Current (A)`: Current values in amperes
+- `Time (s)`: Time values in seconds, for I-t analysis
+- `Voltage (V)`: Applied bias voltage, for IV analysis
+- `Current (A)`: Current values in amperes, for both I-t and IV
 
 Comments in the CSV files should be preceded by '#'.
 
@@ -63,12 +66,5 @@ Comments in the CSV files should be preceded by '#'.
 - Plotly
 - Scipy
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-[Add your chosen license here]
 
 
