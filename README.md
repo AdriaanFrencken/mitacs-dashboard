@@ -1,10 +1,6 @@
 ## I-V and Time-Dependent Photocurrent Measurements
 
 <img src="ASSETS/WaferProber.png" width="400">
-<!-- This application was developed for use with a Keithley 2450 SourceMeter connected to a probe station for semiconductor device characterization: -->
-
-<!-- [Probe Station Setup](ASSETS/ProbeStation.png) -->
-
 
 Current-Voltage (I-V) characterization and time-dependent photocurrent measurements are essential diagnostic tools in semiconductor device development and quality control. I-V curves reveal crucial device parameters such as breakdown voltage, leakage current, and contact resistance, which directly impact device performance and reliability. Time-dependent photocurrent analysis provides insights into carrier dynamics, trapping effects, and photoresponse stability - critical factors for optoelectronic applications like photodetectors and solar cells. Together, these measurements enable researchers and manufacturers to optimize device designs, validate fabrication processes, and ensure consistent performance standards across production batches. In the rapidly evolving semiconductor industry, where device miniaturization and performance demands continue to increase, these characterization techniques remain fundamental for developing next-generation electronic and photonic technologies.
 

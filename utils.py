@@ -59,6 +59,7 @@ def find_pulse_end(df: pd.DataFrame, threshold_current: float = 2e-6,
         return df.index[-1], df.loc[df.index[-1], 'Time (s)']
     
 def calculate_first_derivative(df: pd.DataFrame) -> pd.DataFrame:
+    
     """
     Calculate the first derivative of a log-log plot of current vs voltage.
     """
@@ -66,6 +67,26 @@ def calculate_first_derivative(df: pd.DataFrame) -> pd.DataFrame:
     df['log10_voltage'] = np.log10(df['Voltage (V)'])
     df['power_law_slope'] = np.gradient(df['log10_current'], df['log10_voltage'])
     return df
+
+def get_sample_data(measurement_type: str, folder_path: str):
+    if measurement_type == "I-V":
+        # Walk through directory and subdirectories for files that start with "I-V"
+        sample_IV = []
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                if file.startswith("I-V"):
+                    sample_IV.append(os.path.join(root, file))
+        return sample_IV
+    elif measurement_type == "I-t":
+        # Walk through directory and subdirectories for files that start with "I-t"
+        sample_It = []
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                if file.startswith("I-t"):
+                    sample_It.append(os.path.join(root, file))
+        return sample_It
+    else:
+        raise ValueError("Invalid measurement type")
 
 def data_extractor(measurement_type: str):
     data_source = st.radio(
@@ -97,26 +118,6 @@ def data_extractor(measurement_type: str):
             st.stop()
     
     return data_source, data_files
-
-def get_sample_data(measurement_type: str, folder_path: str):
-    if measurement_type == "I-V":
-        # Walk through directory and subdirectories for files that start with "I-V"
-        sample_IV = []
-        for root, dirs, files in os.walk(folder_path):
-            for file in files:
-                if file.startswith("I-V"):
-                    sample_IV.append(os.path.join(root, file))
-        return sample_IV
-    elif measurement_type == "I-t":
-        # Walk through directory and subdirectories for files that start with "I-t"
-        sample_It = []
-        for root, dirs, files in os.walk(folder_path):
-            for file in files:
-                if file.startswith("I-t"):
-                    sample_It.append(os.path.join(root, file))
-        return sample_It
-    else:
-        raise ValueError("Invalid measurement type")
 
 def get_file_name(file_path: str) -> str:
     return file_path.split("\\")[-1].split(".")[0]
