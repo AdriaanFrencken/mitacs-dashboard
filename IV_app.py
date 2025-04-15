@@ -33,7 +33,10 @@ with st.sidebar:
     )
     size_x = st.slider("Plot width", min_value=300, max_value=1200, value=800, step=50)
     size_y = st.slider("Plot height", min_value=300, max_value=1200, value=800, step=50)
-    fontsize = st.slider("Axis font size", min_value=10, max_value=50, value=20, step=5)
+    # fontsize = st.slider("Axis font size", min_value=10, max_value=50, value=20, step=5)
+    axis_label_size = st.slider("Axis label size", min_value=10, max_value=50, value=25, step=1)
+    axis_tick_size = st.slider("Axis tick size", min_value=10, max_value=50, value=25, step=1)
+    axis_tick_color = st.color_picker("Axis tick color", value="#4A4A4A")
     color_scheme = st.selectbox(
         "Color scheme", ["Plotly", "Set1", "Set2", "Set3", "D3", "G10", "T10"]
     )
@@ -91,43 +94,6 @@ for idx, data_file in enumerate(data_files):
         marker=dict(symbol="circle", size=marker_size, color=colors[idx]),
     )
 
-    # Update layout for better visualization
-    fig_IV.update_layout(
-        showlegend=show_legend,
-        legend_title_text="",
-        xaxis_title="Anode Voltage (V)",
-        yaxis_title="Absolute Current (A)",
-        title="IV Curves for All Files",
-        height=size_y,  # Make figure taller
-        width=size_x,  # Make figure wider
-        legend=dict(
-            yanchor="bottom",
-            y=0.99,
-            xanchor="right",
-            x=0.99,
-            bgcolor="rgba(255, 255, 255, 0.8)",  # Semi-transparent white background
-            font=dict(size=0.8 * fontsize),  # Legend font size
-        ),
-        # Add font settings for axis labels and ticks
-        xaxis=dict(
-            title_font=dict(size=fontsize),  # Increase axis label font size
-            tickfont=dict(size=fontsize * 0.8),  # Increase tick label font size
-            type="log" if log_x else "linear",  # Toggle log scale based on checkbox
-            showgrid=True,  # Show grid lines
-            gridwidth=1,  # Grid line width
-            gridcolor="lightgrey",  # Grid line color
-        ),
-        yaxis=dict(
-            title_font=dict(size=fontsize),  # Increase axis label font size
-            tickfont=dict(size=fontsize * 0.8),  # Increase tick label font size
-            type="log" if log_y else "linear",  # Toggle log scale based on checkbox
-            showgrid=True,  # Show grid lines
-            gridwidth=1,  # Grid line width
-            gridcolor="lightgrey",  # Grid line color
-            exponentformat="e",
-            showexponent="all",  # Grid line spacing
-        ),
-    )
     if "Surface Treatment" in metadata:
         current_at_1000V = df[df["Voltage (V)"] == 1000]["Current (A)"]
         df_bar_chart = pd.concat(
@@ -165,6 +131,44 @@ for idx, data_file in enumerate(data_files):
             ]
         )
         
+# Update layout for better visualization
+fig_IV.update_layout(
+    showlegend=show_legend,
+    legend_title_text="",
+    xaxis_title="Anode Voltage (V)",
+    yaxis_title="Absolute Current (A)",
+    title="IV Curves for All Files",
+    height=size_y,  # Make figure taller
+    width=size_x,  # Make figure wider
+    legend=dict(
+        yanchor="bottom",
+        y=0.99,
+        xanchor="right",
+        x=0.99,
+        bgcolor="rgba(255, 255, 255, 0.8)",  # Semi-transparent white background
+        font=dict(size=axis_label_size, color=axis_tick_color),  # Legend font size
+    ),
+    # Add font settings for axis labels and ticks
+    xaxis=dict(
+        title_font=dict(
+            size=axis_label_size, color=axis_tick_color),  # Increase axis label font size
+        tickfont=dict(size=axis_tick_size, color=axis_tick_color),  # Increase tick label font size
+        type="log" if log_x else "linear",  # Toggle log scale based on checkbox
+        showgrid=True,  # Show grid lines
+        gridwidth=1,  # Grid line width
+        gridcolor="lightgrey",  # Grid line color
+    ),
+    yaxis=dict(
+        title_font=dict(size=axis_label_size, color=axis_tick_color),  # Increase axis label font size
+        tickfont=dict(size=axis_tick_size, color=axis_tick_color),  # Increase tick label font size
+        type="log" if log_y else "linear",  # Toggle log scale based on checkbox
+        showgrid=True,  # Show grid lines
+        gridwidth=1,  # Grid line width
+        gridcolor="lightgrey",  # Grid line color
+        exponentformat="e",
+        showexponent="all",  # Grid line spacing
+    ),
+)
 st.plotly_chart(fig_IV, use_container_width=True, config={"responsive": True})
 
 with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
@@ -193,7 +197,7 @@ with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
             xanchor="right", 
             x=0.99,
             bgcolor="rgba(255, 255, 255, 0.8)",
-            font=dict(size=0.8 * fontsize),
+            font=dict(size=axis_label_size, color=axis_tick_color),
         ),
 
         yaxis=dict(
@@ -201,12 +205,12 @@ with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
             type="log" if log_bar_chart else "linear",  # Set y-axis to logarithmic scale
             exponentformat="e",  # Use scientific notation
             showexponent="all",  # Show exponent for all numbers
-            tickfont=dict(size=fontsize * 0.8),  # Increase tick label font size
-            title_font=dict(size=fontsize),  # Increase axis label font size
+            tickfont=dict(size=axis_tick_size, color=axis_tick_color),  # Increase tick label font size
+            title_font=dict(size=axis_label_size, color=axis_tick_color),  # Increase axis label font size
         ),
         xaxis=dict(
-            title_font=dict(size=fontsize),  # Increase axis label font size
-            tickfont=dict(size=fontsize * 0.8),  # Increase tick label font size
+            title_font=dict(size=axis_label_size, color=axis_tick_color),  # Increase axis label font size
+            tickfont=dict(size=axis_tick_size, color=axis_tick_color),  # Increase tick label font size
         ),
     )
     st.plotly_chart(fig_bar, use_container_width=True, config={"responsive": True})
