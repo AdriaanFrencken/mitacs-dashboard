@@ -11,3 +11,11 @@
 * Calculate the noise or RMS value of `dark_current_start`, `dark_current_end`, `photocurrent_end`,
 * If possible, do a fast fourier transform to extract noise frequencies.
 * Add colors or distinct stylings to the dashed vline and hline
+
+## 2025-04-17
+* Combine the Power law and IV app in one page
+* Add Power Law analysis for negative IV section
+* Add BK8 POR data into default
+* Add optional horizontal dashed line at I=0 for all I-t plots
+
+
