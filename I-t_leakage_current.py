@@ -41,23 +41,6 @@ with st.sidebar:
         "Color Scheme", ["Plotly", "Set1", "Set2", "Set3", "D3", "G10", "T10"]
     )
 
-    left_edge_margin = st.number_input(
-        "Left Edge Margin", min_value=0, max_value=100, value=0, step=1
-    )
-    right_edge_margin = st.number_input(
-        "Right Edge Margin", min_value=0, max_value=100, value=0, step=1
-    )
-    falling_edge_margin = st.number_input(
-        "Falling Edge Margin", min_value=0, max_value=10, value=0
-    )
-    n_time_points = st.number_input(
-        "Number of Time Points for Fall",
-        min_value=100,
-        max_value=1000,
-        value=400,
-        step=100,
-    )
-
 data_source, data_files = data_extractor(measurement_type="I-t")
 colors = get_colors(10, color_scheme) # keep it fixed at 10
 
@@ -79,6 +62,24 @@ with st.expander("Control Panel", expanded=False):
             first_n_points = st.number_input("First n Points to average", min_value=1, max_value=100, value=10, step=1)
         with c2:
             last_n_points = st.number_input("Last n Points to average", min_value=1, max_value=100, value=10, step=1)
+
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        left_edge_margin = st.number_input(
+            "Left Edge Margin", min_value=0, max_value=100, value=0, step=1)
+    with c2:
+        right_edge_margin = st.number_input(
+            "Right Edge Margin", min_value=0, max_value=100, value=0, step=1)
+    with c3:
+        falling_edge_margin = st.number_input(
+            "Falling Edge Margin", min_value=0, max_value=10, value=0)
+    with c4:
+        n_time_points = st.number_input(
+            "Number of Time Points for Fall",
+            min_value=100,
+            max_value=1000,
+            value=400,
+            step=100,)
 
 with st.expander("Leakage Current Analysis Data", expanded=False):
     stats_container = st.container()
