@@ -42,7 +42,7 @@ with st.sidebar:
     )
 
 data_source, data_files = data_extractor(measurement_type="I-t")
-colors = get_colors(10, color_scheme) # keep it fixed at 10
+colors = get_colors(color_scheme)
 
 with st.expander("Control Panel", expanded=False):
     col1, col2, col3 = st.columns(3)

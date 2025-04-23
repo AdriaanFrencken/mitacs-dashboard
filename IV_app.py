@@ -47,7 +47,7 @@ data_source, data_files = data_extractor(measurement_type="I-V")
 
 # Create a figure for all curves
 fig_IV = go.Figure()
-colors = get_colors(len(data_files), color_scheme)
+colors = get_colors(color_scheme)
 df_bar_chart = pd.DataFrame()
 
 for idx, data_file in enumerate(data_files):

@@ -4,7 +4,7 @@ import numpy as np
 import os
 import streamlit as st
 
-def get_colors(n_files, color_scheme):
+def get_colors(color_scheme, n_files=None):
     # qualitative color schemes
     if color_scheme == 'Plotly':
         colors = px.colors.qualitative.Plotly
@@ -31,8 +31,11 @@ def get_colors(n_files, color_scheme):
         colors = px.colors.sequential.Turbo
     elif color_scheme == 'D3':
         colors = px.colors.qualitative.D3
-    # return colors[::max(1, len(colors)//n_files)][:n_files]
-    return colors
+    if n_files is None:
+        return colors
+    if n_files > len(colors):
+        st.error(f"Number of files ({n_files}) exceeds the number of colors ({len(colors)})")
+    return colors[:n_files]
 
 def find_pulse_start(df: pd.DataFrame, pulse_start_current: float = 1e-7) -> tuple[int, float]:
     filter = df['Current (A)'] > pulse_start_current

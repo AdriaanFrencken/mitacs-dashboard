@@ -18,9 +18,12 @@ st.caption("Created by: John Feng")
 
 with st.sidebar:
     show_raw_data = st.checkbox("Show raw data", value=False)
+    convert_absolute_current = st.checkbox("Convert to absolute current", value=True)
     log_x = st.checkbox("Log x-axis", value=True)
     log_y = st.checkbox("Log y-axis", value=True)
     show_legend = st.checkbox("Show legend", value=True)
+    only_positive_voltage = st.checkbox("Voltage > 0", value=False)
+    only_negative_voltage = st.checkbox("Voltage < 0", value=False)
     overlay_power_law = st.checkbox("Overlay power law fit", value=False)
     marker_size = st.slider("Marker size", min_value=1, max_value=10, value=5, step=1)
     line_width = st.slider(
@@ -40,7 +43,7 @@ data_source, data_files = data_extractor(measurement_type="I-V")
 # Create a figure with secondary y-axis
 fig = make_subplots(specs=[[{"secondary_y": True}]])
 fig2 = go.Figure()
-colors = get_colors(len(data_files), color_scheme)
+colors = get_colors(color_scheme)
 
 # Process each uploaded file
 for idx, data_file in enumerate(data_files):

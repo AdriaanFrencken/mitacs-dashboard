@@ -77,7 +77,7 @@ with st.sidebar:
 
 st.subheader("Plot all I-t Photocurrents")
 # Get color sequence based on selection
-colors = get_colors(len(st.session_state.data_files), color_scheme)
+colors = get_colors(color_scheme)
 
 if "data_files" not in st.session_state:
     st.session_state.data_files = []
