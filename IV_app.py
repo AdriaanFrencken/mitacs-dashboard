@@ -41,12 +41,24 @@ with st.sidebar:
         "Color scheme", ["Plotly", "Set1", "Set2", "Set3", "D3", "G10", "T10"]
     )
     st.subheader("Plot labels:")
+    # Add new controls for negative voltage style
+    negative_marker_symbol = st.selectbox(
+        "Negative voltage marker",
+        ["circle", "square", "diamond", "triangle-down", "x"],
+        index=2
+    )
+    negative_line_style = st.selectbox(
+        "Negative voltage line style",
+        ["solid", "dash", "dot", "dashdot"],
+        index=1
+    )
 
 # Data extraction process from uploaded files or sample files
 data_source, data_files = data_extractor(measurement_type="I-V")
 
 # Create a figure for all curves
 fig_IV = go.Figure()
+fig_power_law = go.Figure()
 colors = get_colors(color_scheme)
 df_bar_chart = pd.DataFrame()
 
@@ -61,15 +73,20 @@ for idx, data_file in enumerate(data_files):
         
     # Read the CSV file
     df = pd.read_csv(data_file, comment="#")
+    df["Voltage sign"] = np.sign(df["Voltage (V)"])
     # Calculate first derivative
     df = calculate_first_derivative(df)
+
+    # with st.expander("Raw Data", expanded=False):
+    #     st.write(df)
 
     if only_positive_voltage:
         df_IV = df[df["Voltage (V)"] > 0].copy()
     elif only_negative_voltage:
         df_IV = df[df["Voltage (V)"] < 0].copy()
     elif log_x:
-        df_IV = df[df["Voltage (V)"] > 0].copy()
+        df_IV = df.copy()
+        df_IV['Voltage (V)'] = df_IV["Voltage (V)"].abs()
     else:
         df_IV = df.copy()
 
@@ -84,15 +101,52 @@ for idx, data_file in enumerate(data_files):
             plot_label = st.text_input(f"Plot {idx+1}", 
                                        value=f"{file_name}")
 
+    # Split data into positive and negative voltage parts
+    df_positive = df_IV[df_IV["Voltage sign"] >= 0]
+    df_negative = df_IV[df_IV["Voltage sign"] < 0]
 
-    fig_IV.add_scatter(
-        x=df_IV["Voltage (V)"],
-        y=df_IV["Current (A)"],
-        name=plot_label,
-        mode="markers+lines",
-        line=dict(width=line_width),
-        marker=dict(symbol="circle", size=marker_size, color=colors[idx]),
-    )
+    # Add positive voltage trace
+    if not df_positive.empty:
+        fig_IV.add_scatter(
+            x=df_positive["Voltage (V)"],
+            y=df_positive["Current (A)"],
+            name=plot_label + " (V ≥ 0)",
+            # name=plot_label,
+            mode="markers+lines",
+            line=dict(width=line_width, color=colors[idx]),
+            marker=dict(symbol="circle", size=marker_size, color=colors[idx]),
+            showlegend=True,
+        )
+        
+        fig_power_law.add_scatter(
+            x=df_positive["Voltage (V)"],
+            y=df_positive["power_law_slope"],
+            name=plot_label + " (V ≥ 0)",
+            mode="markers+lines",
+            line=dict(width=line_width, color=colors[idx]),
+        )
+
+    # Add negative voltage trace
+    if not df_negative.empty:
+        fig_IV.add_scatter(
+            x=df_negative["Voltage (V)"],
+            y=df_negative["Current (A)"],
+            name=plot_label + " (V < 0)",
+            mode="markers+lines",
+            line=dict(width=line_width, color=colors[idx], dash=negative_line_style),
+            marker=dict(symbol=negative_marker_symbol, size=marker_size, color=colors[idx]),
+            showlegend=True,
+        )
+        
+        fig_power_law.add_scatter(
+            x=df_negative["Abs Voltage (V)"],
+            y=df_negative["power_law_slope"],
+            name=plot_label + " (V < 0)",
+            mode="markers+lines",
+            line=dict(width=line_width, color=colors[idx], dash=negative_line_style),
+            marker=dict(symbol=negative_marker_symbol, size=marker_size, color=colors[idx]),
+            showlegend=True,
+        )
 
     if "Surface Treatment" in metadata:
         current_at_1000V = df[df["Voltage (V)"] == 1000]["Current (A)"]
@@ -169,7 +223,45 @@ fig_IV.update_layout(
         showexponent="all",  # Grid line spacing
     ),
 )
+
+fig_power_law.update_layout(
+    showlegend=show_legend,
+    legend_title_text="",
+    xaxis_title="Anode Voltage (V)",
+    yaxis_title="Power Law Slope",
+    title="Power Law Slope for All Files",
+    height=size_y,  # Make figure taller
+    width=size_x,  # Make figure wider
+    xaxis=dict(
+        type="log",
+        title_font=dict(size=axis_label_size, color=axis_tick_color),  # Increase axis label font size
+        tickfont=dict(size=axis_tick_size, color=axis_tick_color),  # Increase tick label font size
+        showgrid=True,  # Show grid lines
+        gridwidth=1,  # Grid line width
+        gridcolor="lightgrey",  # Grid line color
+    ),
+    yaxis=dict(
+        title_font=dict(size=axis_label_size, color=axis_tick_color),  # Increase axis label font size
+        tickfont=dict(size=axis_tick_size, color=axis_tick_color),  # Increase tick label font size
+        showgrid=True,  # Show grid lines
+        gridwidth=1,  # Grid line width
+        gridcolor="lightgrey",  # Grid line color
+    ),
+    legend=dict(
+        yanchor="bottom",
+        y=1.0,
+        xanchor="right",
+        x=0.99,
+        bgcolor="rgba(255, 255, 255, 0.8)",  # Semi-transparent white background
+        font=dict(size=axis_label_size, color=axis_tick_color),  # Legend font size
+    ),
+)
+
 st.plotly_chart(fig_IV, use_container_width=True, config={"responsive": True})
+
+with st.expander("Power Law Slope", expanded=True):
+    st.plotly_chart(fig_power_law, use_container_width=True)
+
 
 with st.expander("Bar Chart of Dark Current at 1000V", expanded=True):
     col1, col2 = st.columns(2)
