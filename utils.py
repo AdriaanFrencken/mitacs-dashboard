@@ -66,8 +66,10 @@ def calculate_first_derivative(df: pd.DataFrame) -> pd.DataFrame:
     """
     Calculate the first derivative of a log-log plot of current vs voltage.
     """
-    df['log10_current'] = np.log10(df['Current (A)'])
-    df['log10_voltage'] = np.log10(df['Voltage (V)'])
+    df['Abs Current (A)'] = df['Current (A)'].abs()
+    df['Abs Voltage (V)'] = df['Voltage (V)'].abs()
+    df['log10_current'] = np.log10(df['Abs Current (A)'])
+    df['log10_voltage'] = np.log10(df['Abs Voltage (V)'])
     df['power_law_slope'] = np.gradient(df['log10_current'], df['log10_voltage'])
     return df
 
