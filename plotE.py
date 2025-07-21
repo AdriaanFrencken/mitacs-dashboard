@@ -2,12 +2,6 @@ from statistics import covariance
 import streamlit as st
 import pandas as pd
 import numpy as np
-from utils import (get_colors, 
-                   calculate_first_derivative, 
-                   data_extractor, 
-                   extract_filename,
-                   get_file_name,
-                   extract_metadata)
 import matplotlib.pyplot as plt
 from scipy.optimize import curve_fit
 import math
